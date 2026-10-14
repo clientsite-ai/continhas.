@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Continhas: rodadas de matemática para reforço escolar e ENEM, com dificuldade que sobe conforme você acerta.">
+<title>Continhas</title>
+<style>
+:root{--bg:#101216;--card:#191c22;--ink:#eceef2;--mut:#9aa1ad;--line:#2b303a;--hl:#3b82f6;--ok:#5fd18b;--okbg:#17301f;--bad:#ff8585;--badbg:#341a1a;--sel:#222731;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:radial-gradient(ellipse at 50% -12%,rgba(59,130,246,.1),transparent 43%),linear-gradient(180deg,#12151b 0%,var(--bg) 42%,#0d0f13 100%);background-attachment:fixed;color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:2;background:rgba(16,18,22,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(59,130,246,.08);padding-top:env(safe-area-inset-top,0px)}
+header .wrap{padding-top:12px}
+.brand{font:800 22px/1 system-ui,sans-serif;letter-spacing:-.035em;margin:0 0 10px}
+.brand mark{background:linear-gradient(135deg,#93c5fd 0%,var(--hl) 55%,#8b5cf6 100%);color:#ffffff;padding:2px 7px;border-radius:6px}
+nav.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
+.tab{flex:none;min-height:42px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:0 16px;font:inherit;font-size:14px;cursor:pointer;transition:border-color .2s,transform .16s}
+.tab:hover{border-color:#626a78}
+.tab[aria-current="page"]{background:var(--hl);color:#ffffff;border-color:var(--hl);font-weight:600}
+main{padding:24px 0 40px}
+main section{animation:subir .36s cubic-bezier(.2,.75,.25,1) both}
+.card{position:relative;background:linear-gradient(145deg,rgba(29,33,41,.97),rgba(22,25,31,.98));border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 10px 30px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.025)}
+.card h2{font:700 18px system-ui,sans-serif;margin:0 0 10px}
+.muted{color:var(--mut);font-size:14px}
+.fine{color:var(--mut);font-size:13px;margin:12px 0 0;text-align:center}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.tag{font-weight:700;border-radius:6px;padding:3px 10px;background:var(--hl);color:#ffffff;font-size:13px}
+.seq{display:flex;gap:4px;margin:12px 0 4px}
+.seq span{flex:1;height:8px;border-radius:4px;background:var(--sel);transition:background-color .3s ease}
+.seq span.on{background:linear-gradient(90deg,var(--hl),#8b5cf6)}
+.tema{font-size:13px;color:var(--mut);margin:10px 0 0;text-align:center}
+.timer{display:flex;align-items:center;gap:10px;margin-top:10px}
+.tm{flex:1;height:10px;background:var(--sel);border-radius:5px;overflow:hidden}
+.tm i{display:block;height:100%;width:100%;background:var(--ok)}
+.tm i.baixo{background:var(--bad)}
+.tn{font-weight:700;min-width:3.2em;text-align:right}
+#q{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font:700 30px/1.5 system-ui,sans-serif;min-height:104px;margin:8px 0 14px;padding:12px;border-radius:14px;background:linear-gradient(135deg,rgba(255,255,255,.025),rgba(59,130,246,.025));border:1px solid rgba(255,255,255,.035)}
+#q.txt{font:600 19px/1.5 system-ui,sans-serif}
+.conta-txt{display:block;line-height:1.5}
+#q small{font:400 14px system-ui,sans-serif;color:var(--mut);margin-top:6px}
+#q sup{font-size:.6em}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .2em;font-size:.8em;line-height:1.15}
+.fr i{font-style:normal;padding:0 .25em}
+.fr i:first-child{border-bottom:3px solid currentColor}
+label.lbl{display:block;font-size:14px;color:var(--mut);margin-bottom:6px}
+#in,#apelido{width:100%;min-height:52px;font:600 24px system-ui,sans-serif;text-align:center;padding:10px;border:2px solid var(--line);border-radius:10px;background:linear-gradient(180deg,rgba(9,11,14,.7),rgba(17,20,25,.85));color:var(--ink);transition:border-color .2s,box-shadow .2s}
+#in:focus,#apelido:focus{outline:none;border-color:var(--hl);box-shadow:0 0 0 4px rgba(59,130,246,.12)}
+#in:disabled{opacity:.6}
+#apelido{font-size:18px;min-height:48px}
+.hint{font-size:13px;color:var(--mut);margin:6px 0 0;text-align:center}
+.btn{width:100%;min-height:54px;margin-top:14px;border:0;border-radius:14px;padding:12px 18px;font:inherit;font-size:18px;font-weight:700;letter-spacing:.01em;cursor:pointer;color:#ffffff;background:var(--hl);box-shadow:0 4px 0 #1e40af,0 8px 18px rgba(59,130,246,.18);transition:transform .12s ease,box-shadow .12s ease,background-color .2s ease}
+.btn:hover:not(:disabled){background:#93c5fd}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 #1e40af,0 3px 8px rgba(59,130,246,.12)}
+.btn.sec{background:#2c323e;color:var(--ink);box-shadow:0 4px 0 #14161a,0 8px 18px rgba(0,0,0,.22)}
+.btn.sec:hover:not(:disabled){background:#353c4a}
+.btn.sec:active:not(:disabled){box-shadow:0 1px 0 #14161a}
+.btn:disabled{background:#262b35;color:#6f7787;box-shadow:none;cursor:default;transform:none}
+.ghost{background:none;border:1px solid var(--line);color:var(--mut);border-radius:10px;min-height:44px;padding:0 14px;font:inherit;cursor:pointer;transition:border-color .2s,color .2s}
+.ghost:hover{color:var(--ink);border-color:rgba(59,130,246,.55)}
+:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
+#fb{margin-top:14px;border-radius:10px;padding:10px 12px}
+#fb:empty{display:none}
+#fb.ok{background:var(--okbg);color:var(--ok);font-weight:600;border:1px solid rgba(95,209,139,.2);animation:retorno .3s ease-out both}
+#fb.bad{background:var(--badbg);color:var(--bad);border:1px solid rgba(255,133,133,.2);animation:retorno .3s ease-out both}
+#fb small{display:block;color:var(--ink);font-weight:400;margin-top:4px}
+#up{margin-top:12px;border:2px solid var(--hl);border-radius:10px;padding:12px;text-align:center;font-weight:600}
+#up.marco{border-color:var(--line);font-weight:500}
+#up.celebra{animation:subiu .6s cubic-bezier(.2,.8,.2,1) both;box-shadow:0 0 30px rgba(59,130,246,.15)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+.rot{font-size:14px;color:var(--mut);margin-right:2px}
+.chip{min-height:42px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:0 14px;font:inherit;font-size:14px;cursor:pointer;transition:background-color .2s,border-color .2s,transform .16s}
+.chip:hover{border-color:rgba(59,130,246,.55);transform:translateY(-1px)}
+.chip.bloqueado{opacity:.5;cursor:pointer;border-style:dashed}
+.aviso-nivel{min-height:1.4em;margin:-4px 0 8px;color:var(--bad);text-align:left}
+.chip[aria-pressed="true"]{background:linear-gradient(135deg,#93c5fd,var(--hl) 55%,#8b5cf6);color:#ffffff;border-color:var(--hl);font-weight:600}
+.opcao{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer}
+.home{text-align:center;padding:12px 0 0}
+.kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;margin:0 0 12px;border:1px solid rgba(59,130,246,.22);border-radius:999px;background:linear-gradient(120deg,rgba(59,130,246,.09),rgba(255,255,255,.025));font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.kicker::before{content:"✦";color:var(--hl);font-size:12px}
+.home h1{font:800 clamp(46px,13vw,64px)/1 system-ui,sans-serif;letter-spacing:-.045em;margin:0 0 14px}
+.home h1 mark{background:linear-gradient(135deg,#93c5fd 0%,var(--hl) 48%,#8b5cf6 100%);color:#ffffff;padding:0 12px;border-radius:10px;box-shadow:0 10px 34px rgba(59,130,246,.12)}
+.lead{font-size:18px;max-width:460px;margin:0 auto 22px;color:#c7cbd4}
+.home .card{max-width:420px;margin:0 auto;text-align:left}
+.home .btn{min-height:56px;font-size:18px}
+.pts{list-style:none;padding:0;margin:24px 0 0;display:grid;gap:10px;text-align:left}
+.pts li{background:linear-gradient(135deg,rgba(31,35,43,.96),rgba(22,25,31,.96));border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;transition:transform .22s ease,border-color .22s ease}
+.pts li:hover{transform:translateY(-2px);border-color:rgba(59,130,246,.4)}
+.pts b{font-weight:700}
+.pts span{color:var(--mut);font-size:14px}
+.row{display:flex;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.bar{height:8px;background:var(--sel);border-radius:4px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--ok);transition:width .5s ease}
+.bar i.baixo{background:var(--bad)}
+.resumo p{margin:0 0 6px}
+footer{text-align:center;color:var(--mut);font-size:13px;margin-top:auto;padding:64px 0 28px}
+@media(min-width:640px){.pts{grid-template-columns:repeat(3,1fr)}}
+@keyframes subir{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes retorno{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:none}}
+@keyframes subiu{0%{opacity:.4;transform:translateY(8px) scale(.97)}60%{opacity:1;transform:translateY(-2px) scale(1.02)}100%{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Menu lateral com três traços e duas opções */
+.topo{display:flex;align-items:center;gap:14px;min-height:64px;padding-top:8px;padding-bottom:8px}
+.menu-btn{width:44px;height:44px;flex:none;border:1px solid var(--line);background:var(--card);border-radius:8px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;padding:0;transition:border-color .2s,background-color .2s,transform .18s}
+.menu-btn span{display:block;width:20px;height:2px;background:var(--ink);border-radius:2px}
+.menu-btn:hover{border-color:rgba(59,130,246,.55);background:#222731}
+.menu-btn:active{transform:scale(.94)}
+button.brand{background:none;border:0;padding:0;color:var(--ink);cursor:pointer;font:800 22px/1 system-ui,sans-serif;letter-spacing:-.035em}
+#ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3}
+#drawer{position:fixed;top:0;left:0;bottom:0;width:270px;max-width:82vw;z-index:4;display:flex;flex-direction:column;gap:6px;padding:calc(env(safe-area-inset-top,0px) + 48px) 12px 20px;background:linear-gradient(160deg,#20242d,#171a20 70%);border-right:1px solid var(--line);box-shadow:18px 0 50px rgba(0,0,0,.24);animation:entrar-menu .24s cubic-bezier(.2,.75,.25,1) both}
+#drawer .tab{width:100%;text-align:left;border:0;border-radius:8px;background:none;min-height:48px;padding:0 12px;font-size:16px;color:var(--ink);transition:background-color .18s,padding-left .18s}
+#drawer .tab:hover{background:rgba(255,255,255,.045);padding-left:16px}
+#drawer .tab[aria-current="page"]{background:var(--hl);color:#ffffff;font-weight:600}
+@keyframes entrar-menu{from{transform:translateX(-18px);opacity:0}to{transform:none;opacity:1}}
+.pergunta{font:800 28px/1.25 system-ui,sans-serif;text-align:center;margin:24px 0 18px}
+#v-nome .card{max-width:420px;margin:0 auto;text-align:left}
+#v-nome .btn{min-height:56px;font-size:18px}
+
+.grupo-chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.grupo-chips .chips{margin:0}
+.pauzinhos{display:flex;gap:4px;margin:12px 0 4px}
+.pauzinhos span{flex:1;height:10px;border-radius:4px;background:var(--sel);transition:background-color .3s ease}
+.pauzinhos span.ok{background:var(--ok)}
+.pauzinhos span.erro{background:var(--bad)}
+.contagem{font:800 88px/1 system-ui,sans-serif;color:var(--hl);display:block;animation:contagem .9s ease-out both}
+@keyframes contagem{0%{transform:scale(1.25);opacity:.2}40%{opacity:1}100%{transform:scale(1);opacity:1}}
+.fim{margin-top:14px;border:2px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;animation:retorno .35s ease-out both}
+.fim{position:relative;overflow:hidden}
+.passos{margin:6px 0 0;padding-left:20px;font-size:15px;line-height:1.5;color:var(--ink)}
+#fb.bad small{color:var(--ink)}
+#fb.bad small b{color:var(--ink)}
+.passos li{margin-bottom:4px}
+.titulo-res{font:800 24px system-ui,sans-serif;margin:8px 0 4px}
+.licao{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:10px}
+.licao summary{font:700 17px system-ui,sans-serif;cursor:pointer;min-height:40px;display:flex;align-items:center}
+.licao[open] summary{color:var(--hl)}
+.licao summary{list-style:none;position:relative;padding-right:28px;transition:color .2s ease}
+.licao summary::-webkit-details-marker{display:none}
+.licao summary::after{content:"";position:absolute;right:4px;top:50%;width:9px;height:9px;border-right:2px solid var(--hl);border-bottom:2px solid var(--hl);transform:translateY(-70%) rotate(45deg);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.licao[open] summary::after{transform:translateY(-30%) rotate(225deg)}
+.licao[open]{border-color:rgba(59,130,246,.45);box-shadow:0 10px 30px rgba(59,130,246,.08);animation:licao-abre .45s cubic-bezier(.2,.8,.2,1) both}
+.licao[open] > *:not(summary){animation:licao-item .4s cubic-bezier(.2,.8,.2,1) both}
+.licao[open] > p:nth-of-type(1){animation-delay:.05s}
+.licao[open] > .dica{animation-delay:.12s}
+.licao[open] > .exemplo:nth-of-type(1){animation-delay:.18s}
+.licao[open] > .exemplo:nth-of-type(2){animation-delay:.28s}
+@keyframes licao-abre{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes licao-item{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.licao p{margin:8px 0}
+.licao .passos{font-size:15px}
+#fb .ghost{margin-top:8px;color:var(--ink);border-color:var(--hl)}
+.check{width:44px;height:44px;display:block;margin:0 auto 6px;fill:none;stroke:var(--ok);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.check path{stroke-dasharray:30;stroke-dashoffset:30;animation:desenha .5s .1s ease-out forwards}
+@keyframes desenha{to{stroke-dashoffset:0}}
+.sacode{animation:sacode .45s ease both}
+@keyframes sacode{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+#q.q-entra{animation:q-entra .4s cubic-bezier(.2,.8,.2,1) both}
+@keyframes q-entra{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.pauzinhos span.ok,.pauzinhos span.erro{animation:pop .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes pop{0%{transform:scaleY(.4)}60%{transform:scaleY(1.25)}100%{transform:none}}
+#pontosNum.pulso{animation:pulso .6s ease}
+@keyframes pulso{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+#tn.piscar{animation:piscar .6s ease-in-out infinite;color:var(--bad)}
+@keyframes piscar{0%,100%{opacity:1}50%{opacity:.35}}
+.passos-revelar li.entra{animation:entra-passo .4s ease both}
+@keyframes entra-passo{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+.exemplo{margin:10px 0;padding:10px 12px;border-radius:10px;background:var(--sel)}
+.ex-titulo{font-weight:700;margin:0 0 6px}
+.passos-revelar{margin:0 0 8px;padding-left:20px;line-height:1.6}
+.licao .dica{color:var(--mut);font-size:14px}
+.btn-passo{min-height:40px;font-size:14px;width:100%}
+.btn-passo:disabled{opacity:.6}
+.elogio{position:fixed;left:50%;top:50%;z-index:26;transform:translate(-50%,-50%);pointer-events:none;font:800 34px/1 system-ui,sans-serif;letter-spacing:-.01em;text-shadow:0 4px 22px rgba(0,0,0,.55);white-space:nowrap}
+.elogio.facil{color:#3b82f6}
+.elogio.medio{color:#22c55e}
+.elogio.dificil{color:#5fd18b}
+.elogio.ativo{animation:elogio-pula 1s ease-out both}
+@keyframes elogio-pula{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}60%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6)}}
+@media (prefers-reduced-motion:reduce){.elogio.ativo{animation:none;opacity:1}}
+.splash{min-height:calc(100vh - 150px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px 0}
+.splash-logo{font:800 clamp(56px,16vw,84px)/1 system-ui,sans-serif;letter-spacing:-.045em;margin:0;animation:splash-entra .8s cubic-bezier(.2,.8,.2,1) both}
+.splash-logo mark{background:linear-gradient(135deg,#93c5fd 0%,var(--hl) 48%,#8b5cf6 100%);color:#ffffff;padding:0 12px;border-radius:12px;box-shadow:0 10px 34px rgba(59,130,246,.15)}
+.splash-sub{margin:0;color:var(--mut);font-size:17px;animation:splash-sobe .6s .35s both}
+.splash-ola{margin:4px 0 0;color:var(--hl);font-weight:600;animation:splash-sobe .5s .85s both}
+.splash-btn{max-width:300px;min-height:58px;font-size:19px;animation:splash-sobe .5s .95s both}
+@keyframes splash-entra{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+@keyframes splash-sobe{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.splash *{animation:none!important}}
+.home-acoes{max-width:420px;margin:0 auto 18px;display:flex;flex-direction:column;gap:12px}
+.home-continuar{margin-top:0}
+.home-meta{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;text-align:left}
+.home-meta p{margin:0 0 8px;font-size:14px;color:#c7cbd4}
+.home-meta .bar i{transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.abas-info{max-width:420px;margin:0 auto 16px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.abas-info p{margin:6px 0;font-size:15px;color:#c7cbd4}
+.abas-info b{color:var(--ink)}
+.home-pizza{max-width:420px;margin:0 auto 18px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.home-pizza .pizza-wrap{flex-direction:row;align-items:center;justify-content:flex-start;gap:14px;padding-left:22px}
+.home-pizza .pizza{width:120px;height:120px}
+.home-pizza .legenda{font-size:15px;gap:6px}
+.palavra-erro{position:fixed;left:50%;top:50%;z-index:26;transform:translate(-50%,-50%);pointer-events:none;font:800 34px/1 system-ui,sans-serif;color:#ef4444;text-shadow:0 4px 22px rgba(0,0,0,.6);white-space:nowrap}
+.palavra-erro.ativo{animation:palavra-erro-treme 1.1s ease-out both}
+@keyframes palavra-erro-treme{0%{opacity:0;transform:translate(-50%,-50%) scale(.6) rotate(0)}22%{opacity:1;transform:translate(-50%,-50%) scale(1.08) rotate(-4deg)}34%{transform:translate(-50%,-50%) scale(1.05) rotate(4deg)}46%{transform:translate(-50%,-50%) scale(1.02) rotate(-2deg)}60%{transform:translate(-50%,-50%) scale(1) rotate(0)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.9)}}
+@media (prefers-reduced-motion:reduce){.palavra-erro.ativo{animation:none;opacity:1}}
+.fim strong{font:700 18px system-ui,sans-serif}
+.fim.gabarito{border-color:var(--hl);box-shadow:0 0 34px rgba(59,130,246,.28)}
+.explosao{position:absolute;left:50%;top:70px;width:0;height:0;pointer-events:none}
+.confete{position:absolute;left:0;top:0;width:9px;height:9px;border-radius:2px;background:var(--c);animation:explode 1.2s cubic-bezier(.15,.7,.3,1) both}
+@keyframes explode{0%{transform:rotate(var(--a)) translateX(0) scale(1);opacity:1}80%{opacity:1}100%{transform:rotate(var(--a)) translateX(var(--t)) scale(.5);opacity:0}}
+@media (prefers-reduced-motion:reduce){.confete{display:none}}
+.fim.feliz{border-color:var(--hl);box-shadow:0 0 30px rgba(59,130,246,.15)}
+.fim.feliz::after{content:"✦  ✧  ✦";color:var(--hl);letter-spacing:.5em;font-size:14px}
+.fim.media{border-color:#8fa3c2}
+.fim.triste{border-color:var(--bad)}
+.rosto{width:84px;height:84px;margin-bottom:4px}
+.fim.feliz .rosto{animation:pula .8s cubic-bezier(.2,.8,.2,1) both}
+.fim.media .rosto{animation:balanca 1s ease-in-out both}
+.fim.triste .rosto{animation:cai .9s ease-out both}
+@keyframes pula{0%{transform:scale(.6)}50%{transform:scale(1.12) translateY(-6px)}75%{transform:translateY(1px)}100%{transform:none}}
+@keyframes balanca{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+@keyframes cai{0%{transform:translateY(-16px);opacity:.3}100%{transform:none;opacity:1}}
+.grade-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px}
+.grade-stats div{background:var(--sel);border-radius:10px;padding:12px;text-align:center}
+.grade-stats b{display:block;font:800 22px system-ui,sans-serif}
+.grade-stats span{font-size:13px;color:var(--mut)}
+@media(min-width:640px){.grade-stats{grid-template-columns:repeat(4,1fr)}}
+.bar i.media{background:#8fa3c2}
+.bar i.feliz{background:var(--hl)}
+.bar i.triste{background:var(--bad)}
+.drawer-brand{font:800 24px/1 system-ui,sans-serif;letter-spacing:-.035em;margin:0 0 18px 12px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.drawer-brand mark{background:linear-gradient(135deg,#93c5fd 0%,var(--hl) 55%,#8b5cf6 100%);color:#ffffff;padding:2px 7px;border-radius:6px}
+
+.chave-tempo{display:flex;align-items:center;justify-content:space-between;gap:14px;position:relative;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 16px;margin:0 0 14px;cursor:pointer;transition:border-color .2s ease,background-color .2s ease}
+.chave-tempo:hover{border-color:rgba(59,130,246,.45)}
+.chave-tempo:focus-within{border-color:var(--hl);box-shadow:0 0 0 4px rgba(59,130,246,.12)}
+.chave-texto{display:flex;flex-direction:column;gap:2px}
+.chave-texto b{font-size:17px}
+.chave-texto small{font-size:13px;color:var(--mut)}
+.chave-tempo input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.trilho{flex:none;width:58px;height:34px;border-radius:999px;background:#2c323e;border:2px solid #3a4150;position:relative;transition:background-color .2s ease,border-color .2s ease}
+.bolinha{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#c7cbd4;transition:transform .22s cubic-bezier(.2,.8,.2,1),background-color .2s ease}
+.chave-tempo input:checked ~ .trilho{background:var(--hl);border-color:var(--hl)}
+.chave-tempo input:checked ~ .trilho .bolinha{transform:translateX(24px);background:#14161a}
+.chave-tempo input:focus-visible ~ .trilho{outline:3px solid var(--hl);outline-offset:3px}
+.chave-tempo input:checked ~ .trilho:after{content:"";}
+.chave-baixo{margin:14px 0 0}
+.pizza-wrap{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.pizza{width:140px;height:140px;flex:none;animation:surgir .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes surgir{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+.legenda{list-style:none;padding:0;margin:0;display:grid;gap:8px;font-size:15px}
+.marca{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:middle}
+
+#q{position:relative}
+.ref-oficial{position:absolute;top:8px;right:12px;font:500 12px/1.2 system-ui,sans-serif;color:var(--mut);letter-spacing:.01em}
+#q.oficial{padding-top:34px}
+#q.oficial small{display:block;margin-top:8px}
+
+.entrada{min-height:68vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px 0}
+.entrada-ola{font:800 clamp(28px,8vw,38px)/1.2 system-ui,sans-serif;letter-spacing:-.02em;margin:0;animation:subir .5s .05s both}
+.entrada-nivel{display:flex;gap:10px;align-items:center;animation:subir .5s .25s both}
+.entrada-nivel .tag{font-size:17px;padding:7px 16px;animation:surgir .6s .35s both}
+.entrada-pts{display:flex;flex-direction:column;align-items:center;gap:2px;animation:subir .5s .45s both}
+.entrada-pts b{font:800 64px/1 system-ui,sans-serif;color:var(--hl);font-variant-numeric:tabular-nums}
+.entrada-barra{width:min(320px,80%);height:10px;background:var(--sel);border-radius:6px;overflow:hidden;animation:subir .5s .55s both}
+.entrada-barra i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--hl),#8b5cf6);border-radius:6px;transition:width 1s .6s cubic-bezier(.2,.8,.2,1)}
+#entradaSub{margin:0;animation:subir .5s .7s both}
+#entradaPular{margin-top:6px;animation:subir .5s .8s both}
+@keyframes surgir{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+
+.onda{position:fixed;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+.onda svg{position:absolute;inset:0;width:100%;height:100%;transform:translateX(-80%)}
+.onda.ativa svg{animation:onda-passa 2.4s cubic-bezier(.45,0,.25,1) both}
+.onda-fundo{fill:#b8962e}
+.onda-topo{fill:#3b82f6}
+@keyframes onda-passa{from{transform:translateX(-80%)}to{transform:translateX(100%)}}
+#graos{position:absolute;inset:0}
+.grao{position:absolute;left:var(--x);top:var(--y);width:6px;height:6px;border-radius:50%;background:#93c5fd;opacity:0}
+.onda.ativa .grao{animation:grao-voa 1.5s var(--d) ease-out both}
+@keyframes grao-voa{0%{opacity:0;transform:translate(-30px,0)}25%{opacity:1}100%{opacity:0;transform:translate(110px,-34px)}}
+@media (prefers-reduced-motion:reduce){.onda{display:none!important}}
+
+.ponto-onda{position:absolute;left:0;top:44%;transform:translateX(calc(-52vw - 56px));display:flex;flex-direction:column;align-items:center;min-width:112px;padding:10px 16px;border-radius:16px;background:#14161a;color:#3b82f6;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:onda-ponto 2.4s cubic-bezier(.45,0,.25,1) both}
+.ponto-onda b{font:800 36px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.ponto-onda span{font:600 12px/1.2 system-ui,sans-serif;color:#c7cbd4;text-transform:uppercase;letter-spacing:.08em}
+@keyframes onda-ponto{from{transform:translateX(calc(-52vw - 56px))}to{transform:translateX(calc(128vw - 56px))}}
+.meta-rodada{margin-top:8px}
+.pontos-badge{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--mut);padding:6px 12px;border:1px solid var(--line);border-radius:999px}
+.pontos-badge b{color:var(--hl);font-size:18px;font-variant-numeric:tabular-nums}
+.pontos-badge.recebe{animation:recebe .7s cubic-bezier(.2,.8,.2,1)}
+@keyframes recebe{0%{transform:scale(1)}40%{transform:scale(1.12);border-color:var(--hl)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.ponto-onda{animation:none}}
+
+.entrada{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;min-height:68vh;padding:24px 0}
+.entrada-card{width:min(300px,80vw);aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;text-align:center;background:linear-gradient(145deg,rgba(29,33,41,.98),rgba(22,25,31,.98));border:1px solid var(--line);border-radius:22px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.entrada-ola{margin:0;font-size:18px;color:var(--mut)}
+.entrada-nome{margin:0;font:800 clamp(26px,8vw,34px)/1.1 system-ui,sans-serif;letter-spacing:-.02em;word-break:break-word}
+.entrada-linha{display:flex;align-items:center;gap:10px;font-size:16px}
+.entrada-pts{font:800 28px/1 system-ui,sans-serif;color:var(--hl);font-variant-numeric:tabular-nums}
+.entrada-sub{margin:4px 0 0;font-size:14px}
+.entrada.entrar .entrada-card{animation:cartao-in .5s cubic-bezier(.2,.8,.2,1) both}
+.entrada.sair .entrada-card{animation:cartao-out .45s ease-in both}
+@keyframes cartao-in{from{opacity:0;transform:scale(.9) translateY(14px)}to{opacity:1;transform:none}}
+@keyframes cartao-out{to{opacity:0;transform:scale(.94)}}
+.entrada.sair #entradaPular{opacity:0}
+#entradaPular{transition:opacity .3s}
+@media (prefers-reduced-motion:reduce){.entrada.entrar .entrada-card,.entrada.sair .entrada-card{animation:none}}
+
+#cortina{position:fixed;inset:0;z-index:20;pointer-events:none;transform:translateX(-100%);background:linear-gradient(100deg,#3b82f6 0%,#8b5cf6 55%,#8b5cf6 100%)}
+#cortina.cobre,#cortina.revela{box-shadow:0 0 40px rgba(59,130,246,.35)}
+#cortina.cobre{animation:cortina-entra .33s cubic-bezier(.6,0,.2,1) forwards}
+#cortina.revela{animation:cortina-sai .4s cubic-bezier(.6,0,.2,1) forwards}
+@keyframes cortina-entra{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+@keyframes cortina-sai{from{transform:translateX(0)}to{transform:translateX(100%)}}
+.anel-wrap{position:relative;width:118px;height:118px;margin:4px 0}
+.anel{width:100%;height:100%;transform:rotate(-90deg)}
+.anel-fundo{fill:none;stroke:var(--sel);stroke-width:7}
+.anel-prog{fill:none;stroke:var(--hl);stroke-width:7;stroke-linecap:round;stroke-dasharray:213.6;stroke-dashoffset:213.6;transition:stroke-dashoffset 1s .3s cubic-bezier(.2,.8,.2,1)}
+.anel-txt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.anel-txt b{font:800 22px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.anel-txt span{font-size:12px;color:var(--mut)}
+
+.desbloqueio{position:fixed;left:50%;top:38%;z-index:30;transform:translate(-50%,-50%);pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 24px;min-width:200px;background:var(--card);border:2px solid var(--hl);border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.45);font:700 17px/1.2 system-ui,sans-serif;text-align:center}
+.desbloqueio.ativo{animation:desbloq-entra 2.4s ease both}
+.desbloqueio .cadeado{width:64px;height:80px}
+.cadeado .corpo{fill:var(--hl)}
+.cadeado .arco{stroke:var(--hl);animation:arco-abre 2.4s ease both}
+.desbloqueio.ativo .cadeado{animation:cadeado-treme .5s ease .15s both}
+#desbloqueioTxt{margin:0}
+@keyframes desbloq-entra{0%{opacity:0;transform:translate(-50%,-40%) scale(.9)}12%{opacity:1;transform:translate(-50%,-50%) scale(1.03)}18%{transform:translate(-50%,-50%) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-58%)}}
+@keyframes cadeado-treme{0%,100%{transform:rotate(0)}25%{transform:rotate(-7deg)}50%{transform:rotate(6deg)}75%{transform:rotate(-3deg)}}
+@keyframes arco-abre{0%,35%{transform:translateY(0)}60%,100%{transform:translateY(-12px)}}
+@media (prefers-reduced-motion:reduce){.desbloqueio.ativo,.desbloqueio.ativo .cadeado,.cadeado .arco{animation:none}}
+
+/* Entradas em sequência e transições suaves (versão final) */
+#v-home .kicker,#v-home h1,#v-home #ola,#v-home .lead{animation:subir .55s cubic-bezier(.2,.8,.2,1) both}
+#v-home #ola{animation-delay:.08s}
+#v-home .lead{animation-delay:.16s}
+#v-home .home-acoes > *{animation:subir .5s .24s cubic-bezier(.2,.8,.2,1) both}
+#v-home .home-acoes > .home-meta{animation-delay:.34s}
+#v-home .home-pizza{animation:subir .5s .44s cubic-bezier(.2,.8,.2,1) both}
+#v-pr .card{animation:subir .5s cubic-bezier(.2,.8,.2,1) both}
+#v-pr .card:nth-of-type(2){animation-delay:.08s}
+#v-pr .card:nth-of-type(3){animation-delay:.16s}
+#v-pr .card:nth-of-type(4){animation-delay:.24s}
+#v-pr .card:nth-of-type(5){animation-delay:.32s}
+#listaLicoes .licao{animation:subir .45s cubic-bezier(.2,.8,.2,1) both}
+#listaLicoes .licao:nth-child(2){animation-delay:.04s}
+#listaLicoes .licao:nth-child(3){animation-delay:.08s}
+#listaLicoes .licao:nth-child(4){animation-delay:.12s}
+#listaLicoes .licao:nth-child(5){animation-delay:.16s}
+#listaLicoes .licao:nth-child(6){animation-delay:.2s}
+#listaLicoes .licao:nth-child(7){animation-delay:.24s}
+#listaLicoes .licao:nth-child(8){animation-delay:.28s}
+#listaLicoes .licao:nth-child(9){animation-delay:.32s}
+#listaLicoes .licao:nth-child(10){animation-delay:.36s}
+#q,.card{transition:transform .2s ease,box-shadow .2s ease}
+.chip,.tab,.btn,.ghost{transition:transform .15s ease,background-color .2s ease,box-shadow .2s ease,border-color .2s ease,color .2s ease}
+.chip:active,.tab:active,.ghost:active{transform:scale(.96)}
+.pauzinhos span{transition:background-color .3s ease,transform .2s ease}
+.seq span{transition:background-color .3s ease}
+#fb.ok,#fb.bad{transition:background-color .3s ease,color .3s ease}
+.fim{transition:border-color .3s ease,box-shadow .3s ease}
+.aviso-nivel{transition:opacity .25s ease}
+@media (prefers-reduced-motion:reduce){#v-home *,#v-pr .card,#listaLicoes .licao{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap topo">
+    <button class="menu-btn" id="menuBtn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span></button>
+    <button class="brand" id="brand" type="button" aria-label="Ir para o início" hidden>Con<mark>tinhas</mark></button>
+  </div>
+</header>
+<div id="ov" hidden></div>
+<div id="cortina" aria-hidden="true"></div>
+<div id="elogio" class="elogio" aria-hidden="true" hidden></div>
+<div id="palavraErro" class="palavra-erro" aria-hidden="true" hidden></div>
+<div id="desbloqueio" class="desbloqueio" role="status" aria-live="polite" hidden>
+  <svg viewBox="0 0 64 80" class="cadeado" aria-hidden="true">
+    <path class="arco" d="M17 36 V24 a15 15 0 0 1 30 0 V36" fill="none" stroke-width="6" stroke-linecap="round"/>
+    <rect class="corpo" x="8" y="36" width="48" height="38" rx="8"/>
+    <circle cx="32" cy="52" r="5" fill="#14161a"/>
+  </svg>
+  <p id="desbloqueioTxt"></p>
+</div>
+<nav id="drawer" aria-label="Menu" hidden>
+  <p class="drawer-brand" aria-hidden="true">Con<mark>tinhas</mark></p>
+  <button class="tab" type="button" data-v="ex">Exercícios</button>
+  <button class="tab" type="button" data-v="res">Resoluções</button>
+  <button class="tab" type="button" data-v="pr">Progresso</button>
+</nav>
+
+<main class="wrap">
+
+  <section id="v-splash" class="splash" aria-labelledby="titulo-splash">
+    <h1 id="titulo-splash" class="splash-logo">Con<mark>tinhas</mark></h1>
+    <p class="splash-sub">Matemática em rodadas curtas</p>
+    <p class="splash-ola" id="splashOla"></p>
+    <button class="btn splash-btn" id="iniciar" type="button">Iniciar</button>
+  </section>
+
+  <section id="v-home" class="home" aria-labelledby="titulo">
+    <h1 id="titulo">Con<mark>tinhas</mark></h1>
+    <p id="ola" class="muted"></p>
+    <p class="lead">Treine contas, frações, porcentagens, potências e equações, com correção na hora e dicas quando você erra.</p>
+    <div class="home-acoes" id="homeAcoes">
+      <button class="btn home-continuar" id="continuarBtn" type="button">Começar</button>
+      <div class="home-meta" id="homeMeta">
+        <p id="metaTxt"></p>
+        <div class="bar"><i id="metaBarra"></i></div>
+      </div>
+    </div>
+    <div class="home-pizza" id="homePizza"></div>
+    <p class="fine"><button class="ghost" id="trocar" type="button" hidden>Trocar nome</button></p>
+  </section>
+
+  <section id="v-entrada" class="entrada" aria-live="polite" hidden>
+    <div class="entrada-card" id="cartaoEntrada">
+      <p class="entrada-ola">Bem-vindo,</p>
+      <p class="entrada-nome" id="entradaNome"></p>
+      <div class="anel-wrap">
+        <svg class="anel" viewBox="0 0 80 80" aria-hidden="true"><circle class="anel-fundo" cx="40" cy="40" r="34"/><circle class="anel-prog" id="anelProg" cx="40" cy="40" r="34"/></svg>
+        <div class="anel-txt"><b id="anelNum">0/10</b><span>nesta rodada</span></div>
+      </div>
+      <div class="entrada-linha"><span class="muted">Nível</span><span class="tag" id="entradaNivel"></span></div>
+      <div class="entrada-linha"><span class="muted">Pontuação</span><b class="entrada-pts" id="entradaPts"></b></div>
+      <p class="muted entrada-sub" id="entradaSub"></p>
+    </div>
+    <button class="ghost" id="entradaPular" type="button">Continuar</button>
+  </section>
+
+  <section id="v-nome" class="home" aria-labelledby="h-nome" hidden>
+    <h2 id="h-nome" class="pergunta">Qual é o seu nome?</h2>
+    <div class="card">
+      <label class="lbl" for="apelido">Seu nome ou apelido</label>
+      <input id="apelido" maxlength="30" autocomplete="nickname" placeholder="Ex.: Ana">
+      <p class="hint" id="nomeMsg" role="status"></p>
+      <button class="btn" id="continuar" type="button">Continuar</button>
+      <p class="fine">Usamos o nome só para cumprimentar você. Sem cadastro.</p>
+    </div>
+  </section>
+
+  <section id="v-ex" aria-label="Exercícios" hidden>
+    <div class="grupo-chips">
+      <span class="rot">Dificuldade</span>
+      <div class="chips" id="niveis" role="group" aria-label="Dificuldade"></div>
+    </div>
+    <p class="hint aviso-nivel" id="avisoNivel" role="status"></p>
+    <div class="grupo-chips" id="grupoEtapas">
+      <span class="rot">Etapa</span>
+      <div class="chips" id="etapas" role="group" aria-label="Etapa"></div>
+    </div>
+    <div class="card">
+      <div class="meta"><span class="tag" id="nivel"></span><span class="pontos-badge" id="pontosBadge">Pontuação <b id="pontosNum">0</b></span></div>
+      <div class="meta meta-rodada"><span class="muted" id="rodadaTxt"></span></div>
+      <div class="pauzinhos" id="pauzinhos" aria-hidden="true"></div>
+      <div class="timer" id="trow" hidden><div class="tm"><i id="tb"></i></div><span class="tn" id="tn"></span></div>
+      <p class="tema" id="tema"></p>
+      <div id="q" aria-live="polite"></div>
+      <form id="f" novalidate>
+        <label class="lbl" for="in">Sua resposta</label>
+        <input id="in" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="hint">
+        <p class="hint" id="hint">Frações: 3/4. Decimais: 0,75. Negativos: −5.</p>
+        <button class="btn" id="go" type="submit">Conferir</button>
+      </form>
+      <div id="fb" role="status"></div>
+      <div id="fim" hidden></div>
+    </div>
+    <label class="chave-tempo chave-baixo">
+      <span class="chave-texto"><b>Cronômetro</b><small>Tempo por questão. Se esgotar, conta como erro. Sem cronômetro, os pontos caem pela metade.</small></span>
+      <input type="checkbox" id="tg" role="switch">
+      <span class="trilho" aria-hidden="true"><span class="bolinha"></span></span>
+    </label>
+  </section>
+
+  <section id="v-res" aria-label="Resoluções" hidden>
+    <h2 class="titulo-res">Resoluções</h2>
+    <p class="muted">Explicações curtas de cada assunto, com um exemplo passo a passo.</p>
+    <div id="listaLicoes"></div>
+  </section>
+
+  <section id="v-pr" aria-label="Progresso" hidden>
+    <div class="card"><h2>Resumo</h2><div id="sum"></div></div>
+    <div class="card"><h2>Resultado das rodadas</h2><div id="pizza"></div></div>
+    <div class="card"><h2>Pontos por dificuldade</h2><div id="pizzaPontos"></div></div>
+    <div class="card"><h2>Rodadas recentes</h2><div id="hist"></div></div>
+    <div class="card"><h2>Por nível</h2><div id="niv"></div></div>
+    <div class="card"><h2>Por assunto</h2><div id="temas"></div></div>
+    <button class="ghost" id="zerar" type="button">Zerar progresso</button>
+  </section>
+
+  <footer>Continhas • Todos direitos reservados</footer>
+</main>
+
+<script>
+/*MOTOR*/
+// Dificuldade: cada conta recebe uma nota de 0 a 100 pela operação e pelo tamanho dos valores.
+// Faixas: Fácil 0–29, Médio 30–59, Difícil 60–100.
+// Uma rodada tem 10 questões. Acertar 8 ou mais passa de nível; 5 a 7 é uma rodada média; 4 ou menos é triste.
+const BANDAS=[{nome:"Fácil",piso:0,teto:29},{nome:"Médio",piso:30,teto:59},{nome:"Difícil",piso:60,teto:100}];
+const TAM_BLOCO=10,META_PASSA=8,META_MEDIA=5,MAX_HIST=60;
+const PASSO_SOBE=3,PASSO_DESCE=4,CANDIDATOS=60,CHAVE="continhas_v5";
+const TEMAS={
+  soma:{nome:"Soma e subtração",dica:"Some ou subtraia coluna por coluna, começando pelas unidades. Quando uma coluna passar de 9, vai um para a seguinte."},
+  mult:{nome:"Multiplicação",dica:"Multiplicar é somar grupos iguais: 4 × 3 = 4 + 4 + 4."},
+  div:{nome:"Divisão",dica:"Pergunte: que número vezes o divisor dá o total?"},
+  expr:{nome:"Expressões",dica:"Ordem: parênteses primeiro, depois × e ÷, por último + e −."},
+  neg:{nome:"Números negativos",dica:"Sinais iguais: some os valores e mantenha o sinal. Sinais diferentes: subtraia e use o sinal do maior."},
+  frac:{nome:"Frações",dica:"Denominadores iguais: some os numeradores. Diferentes: ache um denominador comum. Na multiplicação, multiplique numerador com numerador e denominador com denominador."},
+  pot:{nome:"Potências e raízes",dica:"A raiz desfaz a potência: √81 = 9, porque 9 × 9 = 81. ∛8 = 2, porque 2 × 2 × 2 = 8."},
+  perc:{nome:"Porcentagem",dica:"Ache 1% dividindo por 100, depois multiplique pelo percentual."},
+  eq:{nome:"Equações de 1º grau",dica:"Desfaça as operações na ordem inversa: o que soma passa subtraindo, o que multiplica passa dividindo."},
+  banco:{nome:"Questões do banco",dica:"Releia o enunciado, escreva a conta e confira a resolução."},
+  enem:{nome:"Problemas com enunciado",dica:"Leia a pergunta primeiro e identifique os números. Depois escreva a conta que responde exatamente o que foi pedido."}
+};
+
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const escolha=arr=>arr[Math.floor(Math.random()*arr.length)];
+const sinal=v=>Math.random()<0.5?v:-v;
+const num=v=>String(v).replace("-","−");
+const coefTxt=a=>a===1?"":a===-1?"−":num(a);
+const fracTag=(n,d)=>`<span class="fr"><i>${num(n)}</i><i>${d}</i></span>`;
+const fHTML=f=>f.d===1?num(f.n):fracTag(f.n,f.d);
+function mag(v){v=Math.abs(v);return v<10?0:20+42*Math.log10(v/10)}
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a||1}
+const fr=(n,d=1)=>{if(d<0){n=-n;d=-d}const g=gcd(n,d);return{n:n/g,d:d/g}};
+const fIgual=(x,y)=>x.n*y.d===y.n*x.d;
+const OPF={add:(x,y)=>fr(x.n*y.d+y.n*x.d,x.d*y.d),sub:(x,y)=>fr(x.n*y.d-y.n*x.d,x.d*y.d),mul:(x,y)=>fr(x.n*y.n,x.d*y.d),div:(x,y)=>fr(x.n*y.d,x.d*y.n)};
+const OPS={add:"+",sub:"−",mul:"×",div:"÷"};
+
+function temVaiUm(a,b){a=Math.abs(a);b=Math.abs(b);while(a||b){const s=a%10+b%10;if(s>=10)return true;a=Math.floor(a/10);b=Math.floor(b/10)}return false}
+
+function gSoma(){
+  const M=escolha([9,20,99,999]);
+  let a=rnd(1,M),b=rnd(1,M);
+  if(Math.random()<0.5){
+    if(a<b)[a,b]=[b,a];
+    const r=a-b;
+    return{tema:"soma",q:`${a} − ${b} = ?`,a:fr(r),d:(temVaiUm(r,b)?12:0)+mag(Math.max(a,b))};
+  }
+  return{tema:"soma",q:`${a} + ${b} = ?`,a:fr(a+b),d:(temVaiUm(a,b)?12:0)+mag(Math.max(a,b))};
+}
+function gMult(){
+  const grande=Math.random()<0.5;
+  const a=rnd(2,grande?9:10),b=grande?rnd(11,99):rnd(2,10);
+  return{tema:"mult",q:`${a} × ${b} = ?`,a:fr(a*b),d:(grande?14:0)+mag(Math.max(a,b))};
+}
+function gDiv(){
+  const grande=Math.random()<0.4;
+  const b=rnd(2,10),c=grande?rnd(11,99):rnd(2,10),total=b*c;
+  return{tema:"div",q:`${total} ÷ ${b} = ?`,a:fr(c),d:(grande?8:4)+mag(total)};
+}
+function gExpr(){
+  const t=rnd(0,2),a=rnd(2,20),b=rnd(2,9),c=rnd(2,9);
+  if(t===0)return{tema:"expr",q:`${a} + ${b} × ${c} = ?`,a:fr(a+b*c),d:34+mag(Math.max(a,b*c))};
+  if(t===1)return{tema:"expr",q:`(${a} + ${b}) × ${c} = ?`,a:fr((a+b)*c),d:36+mag(Math.max(a+b,c))};
+  const x=rnd(3,12),y=rnd(2,9),z=rnd(1,x*y-1);
+  return{tema:"expr",q:`${x} × ${y} − ${z} = ?`,a:fr(x*y-z),d:34+mag(x*y)};
+}
+function gNeg(){
+  const t=rnd(0,3),a=rnd(1,30),b=rnd(1,30);
+  if(t===0)return{tema:"neg",q:`${a} − ${b} = ?`,a:fr(a-b),d:30+mag(Math.max(a,b))};
+  if(t===1)return{tema:"neg",q:`−${a} + ${b} = ?`,a:fr(b-a),d:30+mag(Math.max(a,b))};
+  const c=rnd(2,9);
+  if(t===2)return{tema:"neg",q:`(−${a}) × ${c} = ?`,a:fr(-a*c),d:36+mag(a)};
+  return{tema:"neg",q:`(−${a}) × (−${c}) = ?`,a:fr(a*c),d:38+mag(a)};
+}
+function gFrac(){
+  const t=rnd(0,3);
+  const d1=rnd(2,t===0?12:9),d2=t===0?d1:rnd(2,9);
+  const op=t===0?"add":t===1?"sub":t===2?escolha(["add","sub"]):escolha(["mul","div"]);
+  let P=[rnd(1,d1-1),d1],Q=[rnd(1,d2-1),d2];
+  if(op==="sub"&&P[0]*Q[1]<Q[0]*P[1])[P,Q]=[Q,P];
+  const x=fr(P[0],P[1]),y=fr(Q[0],Q[1]);
+  const base=[20,22,36,38][t];
+  return{tema:"frac",q:`${fracTag(P[0],P[1])} ${OPS[op]} ${fracTag(Q[0],Q[1])} = ?`,a:OPF[op](x,y),d:base+mag(Math.max(P[1],Q[1]))};
+}
+function gPot(){
+  const t=rnd(0,3);
+  if(t===0){const a=rnd(2,12);return{tema:"pot",q:`${a}<sup>2</sup> = ?`,a:fr(a*a),d:24+mag(a)}}
+  if(t===1){const a=rnd(2,6);return{tema:"pot",q:`${a}<sup>3</sup> = ?`,a:fr(a**3),d:32+mag(a)}}
+  if(t===2){const r=rnd(2,15);return{tema:"pot",q:`√${r*r} = ?`,a:fr(r),d:30+mag(r)}}
+  const r=rnd(2,10);return{tema:"pot",q:`∛${r**3} = ?`,a:fr(r),d:40+mag(r)}
+}
+function gPerc(){
+  const bonito=Math.random()<0.5;
+  const p=bonito?escolha([10,20,25,50,75]):escolha([5,15,30,35,40,45,60,65,70,80,85,90,95]);
+  const N=(100/gcd(p,100))*rnd(1,10),v=N*p/100;
+  if(Math.random()<0.3)return{tema:"perc",q:`Um produto custa R$ ${N} e tem desconto de ${p}%. Quanto ele passa a custar, em reais?`,a:fr(N-v),d:(bonito?18:32)+0.5*mag(N),txt:true};
+  return{tema:"perc",q:`${p}% de ${N} = ?`,a:fr(v),d:(bonito?10:24)+0.5*mag(N)};
+}
+function gEq(){
+  const t=rnd(0,3);
+  if(t===0){
+    let x=rnd(1,30);if(Math.random()<0.25)x=-x;
+    const a=sinal(rnd(1,30)),b=x+a;
+    return{tema:"eq",q:`x ${a<0?"−":"+"} ${Math.abs(a)} = ${num(b)}`,a:fr(x),d:30+mag(Math.max(Math.abs(x),Math.abs(a)))+(x<0?12:0),ask:true};
+  }
+  if(t===1){
+    const a=sinal(rnd(2,12));let x=rnd(1,20);if(Math.random()<0.25)x=-x;
+    return{tema:"eq",q:`${coefTxt(a)}x = ${num(a*x)}`,a:fr(x),d:30+mag(Math.max(Math.abs(a),Math.abs(x)))+(x<0?12:0),ask:true};
+  }
+  if(t===2){
+    const a=sinal(rnd(2,9)),x=sinal(rnd(1,12)),c=sinal(rnd(1,30)),e=a*x+c;
+    return{tema:"eq",q:`${coefTxt(a)}x ${c<0?"−":"+"} ${Math.abs(c)} = ${num(e)}`,a:fr(x),d:34+mag(Math.max(Math.abs(a),Math.abs(x),Math.abs(c)))+(x<0?8:0),ask:true};
+  }
+  const k=rnd(2,6),t2=sinal(rnd(0,12)),c=sinal(rnd(1,20)),e=t2+c;
+  return{tema:"eq",q:`<span class="fr"><i>x</i><i>${k}</i></span> ${c<0?"−":"+"} ${Math.abs(c)} = ${num(e)}`,a:fr(k*t2),d:40+mag(Math.max(k,Math.abs(c)))+(k*t2<0?10:0),ask:true};
+}
+// Problemas com enunciado (estilo ENEM), com a mesma regra de dificuldade pelos valores.
+function gEnem(){
+  const t=rnd(0,4);
+  if(t===0){
+    const k=rnd(2,20),c=rnd(2,12);
+    return{tema:"enem",q:`Ana comprou ${k} caixas com ${c} lápis em cada uma. Quantos lápis ela comprou ao todo?`,a:fr(k*c),d:14+mag(Math.max(k,c))};
+  }
+  if(t===1){
+    const preco=20*rnd(2,30),p=escolha([10,20,25,50]),v=preco*p/100;
+    return{tema:"enem",q:`Um livro custa R$ ${preco}. Pedro ganhou ${p}% de desconto na compra. Quanto ele pagou, em reais?`,a:fr(preco-v),d:32+0.5*mag(preco)};
+  }
+  if(t===2){
+    const den=escolha([2,3,4,5,6,8,10]),num_=rnd(1,den-1),total=den*rnd(2,20);
+    return{tema:"enem",q:`Em uma turma de ${total} alunos, ${num_}/${den} gostam de matemática. Quantos alunos gostam de matemática?`,a:fr(total*num_/den),d:40+0.5*mag(total)};
+  }
+  if(t===3){
+    const x=rnd(2,50),n=rnd(2,30);
+    return{tema:"enem",q:`Um número somado a ${n} resulta em ${x+n}. Qual é esse número?`,a:fr(x),d:34+0.6*mag(x+n)};
+  }
+  const v=escolha([40,50,60,80,90,100,120]),h=rnd(2,6);
+  return{tema:"enem",q:`Um carro mantém a velocidade de ${v} km/h durante ${h} horas. Quantos quilômetros ele percorre nesse tempo?`,a:fr(v*h),d:22+0.6*mag(Math.max(v,h*10))};
+}
+const GERADORES=[gSoma,gMult,gDiv,gExpr,gNeg,gFrac,gPot,gPerc,gEq,gEnem];
+// Banco de problemas com enunciado (aba ENEM). Questões originais, inspiradas em temas das provas.
+// Cada item tem resposta única verificada e resolução mostrada após a resposta.
+const BANCO_ENEM=[
+  {id:"e01",d:12,r:48,enunciado:"Uma papelaria organiza 8 cadernos em cada pacote. Uma escola comprou 6 pacotes. Quantos cadernos a escola recebeu ao todo?",res:"8 × 6 = 48."},
+  {id:"e02",d:22,r:6,reais:true,enunciado:"Uma papelaria vendeu 12 canetas por R$ 18,00. Considerando que todas têm o mesmo preço, quanto custariam 4 canetas, em reais?",res:"R$ 18,00 ÷ 12 = R$ 1,50 por caneta; 4 × R$ 1,50 = R$ 6,00."},
+  {id:"e03",d:14,r:315,enunciado:"Uma viagem tem percurso total de 500 km. Depois de percorrer 185 km, quantos quilômetros ainda faltam para chegar ao destino?",res:"500 − 185 = 315."},
+  {id:"e04",d:16,r:52,enunciado:"Mariana tem 3 pacotes de figurinhas, com 15 figurinhas em cada um. Depois ganhou mais 7 figurinhas. Quantas figurinhas ela tem agora?",res:"3 × 15 = 45; 45 + 7 = 52."},
+  {id:"e05",d:24,r:27,reais:true,enunciado:"Um mercado vende 2 litros de suco por R$ 9,00. Quanto custam 6 litros do mesmo suco, mantendo o mesmo preço por litro, em reais?",res:"R$ 9,00 ÷ 2 = R$ 4,50 por litro; 6 × R$ 4,50 = R$ 27,00."},
+  {id:"e06",d:12,r:75,enunciado:"Um jogo tem 4 fases. Em cada fase, Pedro ganha 25 pontos. Depois de 3 fases, quantos pontos ele tem?",res:"3 × 25 = 75."},
+  {id:"e07",d:42,r:300,enunciado:"Uma impressora produz 80 etiquetas em 4 minutos, sempre no mesmo ritmo. Quantas etiquetas serão produzidas em 15 minutos?",res:"80 ÷ 4 = 20 etiquetas por minuto; 20 × 15 = 300."},
+  {id:"e08",d:50,r:170,enunciado:"Em uma planta desenhada na escala 1:40, o espaço reservado para um refrigerador mede 4,5 cm de altura. É preciso deixar 10 cm livres acima do aparelho. Qual é a altura máxima do refrigerador, em centímetros?",res:"4,5 × 40 = 180 cm; 180 − 10 = 170 cm."},
+  {id:"e09",d:50,r:72,enunciado:"Em uma planta desenhada na escala 1:40, o espaço reservado para um refrigerador mede 2,2 cm de largura. É preciso deixar 8 cm livres de cada lado do aparelho. Qual é a largura máxima do refrigerador, em centímetros?",res:"2,2 × 40 = 88 cm; 88 − 8 − 8 = 72 cm."},
+  {id:"e10",d:52,r:8,enunciado:"Uma mala pode pesar, no máximo, 10 kg. Uma calça pesa 2 kg, um par de sapatos pesa 2 kg, e uma calça com duas camisetas pesa 3 kg. Levando duas calças, um par de sapatos e o maior número possível de camisetas, quantas camisetas podem entrar sem ultrapassar o limite?",res:"Duas calças e os sapatos pesam 6 kg. Uma calça com duas camisetas pesa 3 kg, então cada camiseta pesa 0,5 kg. Restam 4 kg; 4 ÷ 0,5 = 8."},
+  {id:"e11",d:40,r:5,enunciado:"Uma pizza foi dividida em 12 fatias iguais. Ana comeu 1/4 da pizza e Bruno comeu 1/3 da pizza. Quantas fatias sobraram?",res:"1/4 de 12 = 3 fatias; 1/3 de 12 = 4 fatias; 12 − 3 − 4 = 5 fatias."},
+  {id:"e12",d:46,r:780,enunciado:"Um tanque tem capacidade de 1200 litros e está com 35% da capacidade. Quantos litros faltam para encher o tanque?",res:"35% de 1200 = 420 litros; 1200 − 420 = 780 litros."},
+  {id:"e13",d:80,r:35,enunciado:"Uma família gasta R$ 100,00 com internet, R$ 500,00 com a mensalidade escolar e R$ 200,00 com a mesada do filho. A internet sobe 20% e a mensalidade sobe 10%. Para o gasto total continuar igual a R$ 800,00, qual deve ser a porcentagem de redução da mesada?",res:"Internet: R$ 120,00; mensalidade: R$ 550,00. A mesada deve ser R$ 130,00, uma redução de R$ 70,00. 70 ÷ 200 × 100 = 35%."},
+  {id:"e14",d:78,r:16,enunciado:"Uma receita produz 40 bolinhas esféricas de 1 cm de diâmetro. Uma encomenda pede 80 bolinhas esféricas de 2 cm de diâmetro. Se a quantidade de ingredientes varia na mesma proporção do volume total, quantas receitas-base são necessárias?",res:"Dobrar o diâmetro multiplica o volume de cada esfera por 8. A encomenda tem o dobro de bolinhas: 8 × 2 = 16 receitas-base."},
+  {id:"e15",d:84,r:5,enunciado:"Um motorista fará uma viagem de 560 km e sai com 35 litros de combustível. Nos primeiros 420 km, o consumo médio é de 15 km/L. Nos 140 km restantes, o rendimento estimado é de 20 km/L, e ele quer chegar com pelo menos 5 litros no tanque. Qual é a quantidade mínima de combustível que deve adicionar no posto?",res:"420 ÷ 15 = 28 litros, restando 7. Os 140 km restantes exigem 7 litros, e ele quer terminar com 5: precisa de 12 litros ao sair. 12 − 7 = 5 litros."},
+  {id:"e16",d:70,r:144,reais:true,enunciado:"Uma loja deu 10% de desconto em um produto de R$ 200,00. Depois, deu mais 20% de desconto sobre o novo preço. Quanto custou o produto após os dois descontos, em reais?",res:"10% de R$ 200,00 = R$ 20,00, passando a R$ 180,00. Depois, 20% de R$ 180,00 = R$ 36,00; resta R$ 144,00."},
+  {id:"e17",d:66,r:120,enunciado:"Em janeiro, fevereiro e março, uma loja vendeu 40, 60 e 80 unidades. Em abril, vendeu o dobro da média desses três meses. Quantas unidades vendeu em abril?",res:"Média: (40 + 60 + 80) ÷ 3 = 60. Dobro: 2 × 60 = 120."},
+  {id:"e18",d:74,r:4,enunciado:"Um mapa tem escala 1:50 000. Duas cidades estão a 8 cm de distância no mapa. Qual é a distância real entre elas, em quilômetros?",res:"8 cm × 50 000 = 400 000 cm = 4 000 m = 4 km."}
+];
+
+// Questões baseadas em provas oficiais do ENEM (enunciados resumidos, conferidos).
+// Itens com figura, tabela ou resposta em intervalo ficaram de fora deste banco.
+const PROVA=(ano,cad)=>`${"https://download.inep.gov.br/enem/provas_e_gabaritos/"}${ano}_PV_impresso_D2_${cad}.pdf`;
+const BANCO_OFICIAL=[
+  {id:"o01",d:22,r:62,ano:2024,cad:"CD5",num:137,nivel:"Fácil",ajuda:"Digite só o número, sem %.",enunciado:"As médias mensais de umidade do ar em seis meses foram 66%, 64%, 54%, 46%, 60% e 64%. Determine a mediana desses valores.",res:"Ordenando: 46, 54, 60, 64, 64, 66. A mediana é (60 + 64) ÷ 2 = 62."},
+  {id:"o02",d:24,r:5,ano:2024,cad:"CD7",num:137,nivel:"Fácil",ajuda:"Digite a média correta.",enunciado:"Um estudante calculou a média de quatro notas dividindo a soma por 5, e o resultado ficou uma unidade abaixo da média correta. Determine a média correta.",res:"Se a soma é S, então S/4 − S/5 = 1, logo S = 20 e a média correta é 20 ÷ 4 = 5."},
+  {id:"o03",d:16,r:581,ano:2021,cad:"CD5",num:136,nivel:"Fácil",ajuda:"Número de anos.",enunciado:"Uma placa informa que uma cidade foi fundada no ano romano MCDLXIX. Quantos anos de fundação ela completará em 2050?",res:"MCDLXIX = 1469; 2050 − 1469 = 581."},
+  {id:"o04",d:22,r:10101,ano:2021,cad:"CD5",num:137,nivel:"Fácil",ajuda:"Digite o número em base binária, ex.: 1011.",enunciado:"Usando as regras de adição na base binária, represente a soma decimal 9 + 12 em base binária.",res:"9 + 12 = 21, e 21 em base binária é 10101."},
+  {id:"o05",d:20,r:[1,5],ano:2022,cad:"CD5",num:137,nivel:"Fácil",ajuda:"Em mL, ex.: 0,2.",enunciado:"Um borrifador contém 360 mL de inseticida, que duram 60 dias quando ele dispara uma vez a cada 48 minutos. Calcule o volume liberado por disparo, em mL.",res:"1 440 ÷ 48 = 30 disparos por dia; 30 × 60 = 1 800 disparos; 360 ÷ 1 800 = 0,2 mL."},
+  {id:"o06",d:18,r:[5,2],ano:2022,cad:"CD5",num:138,nivel:"Fácil",ajuda:"Em dias do planeta, ex.: 2,5.",enunciado:"Em um planeta fictício, um dia equivale a 73 dias terrestres e dois anos do planeta equivalem a um ano terrestre de 365 dias. Quantos dias desse planeta há em um de seus anos?",res:"Um ano do planeta equivale a 365 ÷ 2 = 182,5 dias terrestres; 182,5 ÷ 73 = 2,5."},
+  {id:"o07",d:26,r:7,ano:2023,cad:"CD5",num:136,nivel:"Fácil",ajuda:"Número mínimo de pacotes.",enunciado:"Duas pessoas caminham 30 minutos por dia e precisam consumir 1 g de carboidrato por minuto de caminhada, cada uma. Cada fatia de pão tem 15 g de carboidrato e cada pacote tem 18 fatias. Quantos pacotes, no mínimo, são necessários para 30 dias?",res:"2 × 30 × 30 = 1 800 g, ou 120 fatias; 120 ÷ 18 = 6,67, então são necessários 7 pacotes."},
+  {id:"o10",d:40,r:2550,reais:true,ano:2024,cad:"CD5",num:136,nivel:"Médio",ajuda:"Só o valor em reais, ex.: 2550.",enunciado:"Uma fábrica tem custo fixo mais custo variável proporcional à quantidade produzida. Produzir 30 mochilas custa R$ 1.050; 50 custam R$ 1.650; e 100 custam R$ 3.150. Qual é o custo para 80 mochilas, em reais?",res:"O custo variável é R$ 30 por mochila e o fixo é R$ 150; 150 + 30 × 80 = R$ 2.550."},
+  {id:"o11",d:44,r:3500,reais:true,ano:2024,cad:"CD5",num:138,nivel:"Médio",ajuda:"Só o valor em reais.",enunciado:"Três engenheiros dividirão 40% de um contrato de R$ 71.250 proporcionalmente às horas trabalhadas: 4 dias × 5,5 horas, 5 dias × 4 horas e 6 dias × 2,5 horas. Qual é a maior diferença entre os pagamentos, em reais?",res:"40% de R$ 71.250 = R$ 28.500; 57 horas no total, então R$ 500 por hora. Os pagamentos são R$ 11.000, R$ 10.000 e R$ 7.500; a maior diferença é R$ 3.500."},
+  {id:"o12",d:40,r:[2,3],ano:2024,cad:"CD5",num:141,nivel:"Médio",ajuda:"Digite a razão como fração, ex.: 2/3.",enunciado:"Uma região Q tem três quartos da área de uma região R e metade da população de R. Qual é a razão entre a densidade demográfica de Q e a de R?",res:"A razão das densidades é (1/2) ÷ (3/4) = 2/3."},
+  {id:"o13",d:48,r:[4,3],ano:2024,cad:"CD5",num:142,nivel:"Médio",ajuda:"Com uma casa decimal, ex.: 1,3.",enunciado:"Duas telas de celular medem 3 1/2 e 4 5/6 polegadas na diagonal. Qual é a diferença absoluta entre elas, com uma casa decimal?",res:"4 5/6 − 3 1/2 = 8/6 = 1,333...; com uma casa decimal, 1,3."},
+  {id:"o14",d:50,r:14400,ano:2024,cad:"CD7",num:138,nivel:"Médio",ajuda:"Quantidade de senhas.",enunciado:"Uma senha tem dois algarismos distintos, seguidos de três letras diferentes. Os algarismos podem ser 1, 2, 5, 7 e 0; as letras vêm das teclas 2 (ABC), 5 (JKL) e 7 (PQRS). Quantas senhas são possíveis?",res:"Algarismos: 5 × 4 = 20. Letras: 10 × 9 × 8 = 720. Total: 20 × 720 = 14.400."},
+  {id:"o18",d:56,r:1460,ano:2023,cad:"CD5",num:141,nivel:"Médio",ajuda:"Anos Tzolkin.",enunciado:"Um calendário maia considera um ano Haab de 365 dias e um ano Tzolkin de 260 dias. Uma família governou durante 20 ciclos de 52 anos Haab. Quantos anos Tzolkin correspondem a esse período?",res:"20 × 52 × 365 ÷ 260 = 1.460."},
+  {id:"o21",d:52,r:30,ano:2022,cad:"CD5",num:136,nivel:"Médio",ajuda:"Só o número, sem %.",enunciado:"Uma universidade tem 60 mestres com salário de R$ 8.000 e 40 doutores com salário de R$ 12.000. Os mestres terão aumento de 25%. Qual é o aumento máximo dos doutores para que a média salarial dos 100 professores não ultrapasse R$ 12.240?",res:"Após o aumento, cada mestre recebe R$ 10.000. A soma máxima para os doutores é R$ 624.000, ou R$ 15.600 por pessoa: aumento de 30% sobre R$ 12.000."},
+  {id:"o22",d:46,r:2,reais:true,ano:2022,cad:"CD5",num:140,nivel:"Médio",ajuda:"Diferença em reais, ex.: 2.",enunciado:"Uma geladeira custa R$ 1.000 na promoção à vista. O preço normal é 10% maior; pagando com o cartão da loja, há desconto de 2% sobre o preço normal. A cliente estimou o preço como o valor promocional acrescido de 8%. Qual é a diferença, em reais, entre o valor real e sua estimativa?",res:"Preço normal = R$ 1.100; desconto de 2% = R$ 22; preço final = R$ 1.078. A estimativa foi R$ 1.080; o valor real é R$ 2,00 menor."},
+  {id:"o23",d:58,r:16,ano:2022,cad:"CD5",num:155,nivel:"Médio",ajuda:"Número de voltas.",enunciado:"Em um parque, três voltas no circuito maior e duas no menor totalizam 1.800 m; duas voltas no maior e uma no menor totalizam 1.100 m. Para um treino de exatamente 5.000 m, com número inteiro de voltas e o maior número total de voltas possível, quantas voltas devem ser feitas?",res:"Os circuitos medem 400 m e 300 m. A combinação de 2 voltas maiores e 14 menores soma 5.000 m em 16 voltas."},
+  {id:"o25",d:74,r:756,ano:2024,cad:"CD5",num:139,nivel:"Difícil",ajuda:"Número de equipes.",enunciado:"Um hospital tem 7 cardiologistas e 6 neurologistas e precisa formar uma equipe de 5 médicos, com pelo menos 3 cardiologistas. Quantas equipes diferentes podem ser formadas?",res:"C(7,3)·C(6,2) + C(7,4)·C(6,1) + C(7,5) = 525 + 210 + 21 = 756."},
+  {id:"o26",d:72,r:3,ano:2024,cad:"CD5",num:140,nivel:"Difícil",ajuda:"Segundos a reduzir em cada semáforo.",enunciado:"Dois semáforos ficam vermelhos por 15 segundos a cada ciclo de 60 segundos. A prefeitura reduzirá o tempo vermelho de ambos pela mesma quantidade, para que a probabilidade de encontrar os dois vermelhos na mesma viagem seja 4%. Quantos segundos deve ser reduzido em cada semáforo?",res:"Probabilidade individual: √0,04 = 0,2; tempo vermelho final: 0,2 × 60 = 12 s; redução: 15 − 12 = 3 s."},
+  {id:"o27",d:68,r:2,ano:2024,cad:"CD7",num:136,nivel:"Difícil",ajuda:"Número da objetiva, ex.: 2.",enunciado:"Uma hemácia mede 0,007 mm de diâmetro, e a visão humana sem equipamento distingue objetos a partir de 100 micrômetros. Uma ocular amplia 10 vezes e as objetivas disponíveis ampliam 2, 10, 15, 1,1 e 1,4 vezes. Qual é a objetiva de menor ampliação que permite visualizar a hemácia?",res:"A ampliação precisa ser de pelo menos 0,1 ÷ 0,007 ≈ 14,3. Com a objetiva de 1,4×, a ampliação total é 14×, insuficiente; com 2×, é 20×."},
+  {id:"o28",d:80,r:1572864,ano:2024,cad:"CD7",num:142,nivel:"Difícil",ajuda:"Quantidade de emojis.",enunciado:"Uma mensagem começa com três emojis. Em cada etapa, a pessoa copia a mensagem inteira e a cola ao lado, dobrando a quantidade. Quantos emojis haverá após a 20ª etapa?",res:"A etapa 1 tem 3 emojis, e cada etapa dobra a quantidade. Na etapa 20: 3 × 2¹⁹ = 1.572.864."},
+  {id:"o30",d:78,r:1900000,reais:true,ano:2021,cad:"CD5",num:138,nivel:"Difícil",ajuda:"Receita total, em reais.",enunciado:"Um fazendeiro destina 3 hectares a um loteamento; 0,9 hectare será usado para ruas e calçadas. O restante é dividido em lotes de 300 m². Os primeiros 20 lotes são vendidos a R$ 20.000 cada, e os demais, a R$ 30.000 cada. Qual é a receita total, em reais?",res:"3 ha = 30.000 m²; área para lotes = 21.000 m²; 21.000 ÷ 300 = 70 lotes. Receita: 20 × R$ 20.000 + 50 × R$ 30.000 = R$ 1.900.000."},
+  {id:"o31",d:70,r:[31,10],ano:2020,cad:"CD8",num:139,nivel:"Difícil",ajuda:"Maior média ponderada, com uma casa decimal, ex.: 3,1.",enunciado:"Uma agência avalia cinco empresas com três critérios, de pesos 3, 5 e 2, nesta ordem: rapidez, clareza e cortesia. As notas são: X (5, 1, 2), Y (1, 4, 2), Z (4, 3, 2), W (3, 3, 3) e T (4, 2, 4). Qual é a maior média ponderada entre as empresas?",res:"Z: (4×3 + 3×5 + 2×2) ÷ 10 = 3,1. As demais ficam abaixo: X 2,4; Y 2,7; W 3,0; T 3,0."},
+  {id:"o32",d:82,r:17,ano:2020,cad:"CD5",num:144,nivel:"Difícil",ajuda:"Litros a abastecer na ida.",enunciado:"Uma moto percorre 500 km, consome 5 litros a cada 100 km e tem tanque de 22 litros. O último posto antes do destino fica a 80 km do destino. O motorista sai com o tanque cheio e fará mais 200 km no destino antes de voltar ao posto. Quantos litros deve abastecer no posto, na ida, para conseguir voltar a ele e reabastecer novamente?",res:"Ao chegar ao posto (420 km), restam 1 L. Do posto ao destino, mais 200 km e a volta ao posto são 360 km, que exigem 18 L. Faltam 17 L."}
+];
+for(const b of BANCO_OFICIAL)b.prova=PROVA(b.ano,b.cad);
+BANCO_ENEM.push(...BANCO_OFICIAL);
+const BANCO_NORMAL=[{"id":"n001","e":0,"q":"2 + 3","r":"5","s":"2 + 3 = 5.","reais":false},{"id":"n002","e":0,"q":"4 + 1","r":"5","s":"4 + 1 = 5.","reais":false},{"id":"n003","e":0,"q":"6 + 2","r":"8","s":"6 + 2 = 8.","reais":false},{"id":"n004","e":0,"q":"3 + 5","r":"8","s":"3 + 5 = 8.","reais":false},{"id":"n005","e":0,"q":"7 + 1","r":"8","s":"7 + 1 = 8.","reais":false},{"id":"n006","e":0,"q":"4 + 4","r":"8","s":"4 + 4 = 8.","reais":false},{"id":"n007","e":0,"q":"5 + 1 + 2","r":"8","s":"5 + 1 = 6; 6 + 2 = 8.","reais":false},{"id":"n008","e":0,"q":"1 + 6","r":"7","s":"1 + 6 = 7.","reais":false},{"id":"n009","e":0,"q":"2 + 7","r":"9","s":"2 + 7 = 9.","reais":false},{"id":"n010","e":0,"q":"5 + 3","r":"8","s":"5 + 3 = 8.","reais":false},{"id":"n011","e":0,"q":"9 − 4","r":"5","s":"9 − 4 = 5.","reais":false},{"id":"n012","e":0,"q":"8 − 3","r":"5","s":"8 − 3 = 5.","reais":false},{"id":"n013","e":0,"q":"7 − 2","r":"5","s":"7 − 2 = 5.","reais":false},{"id":"n014","e":0,"q":"6 − 1","r":"5","s":"6 − 1 = 5.","reais":false},{"id":"n015","e":0,"q":"5 − 2","r":"3","s":"5 − 2 = 3.","reais":false},{"id":"n016","e":0,"q":"2 + 3 + 4","r":"9","s":"2 + 3 = 5; 5 + 4 = 9.","reais":false},{"id":"n017","e":0,"q":"8 − 6","r":"2","s":"8 − 6 = 2.","reais":false},{"id":"n018","e":0,"q":"3 + 6 − 2","r":"7","s":"3 + 6 = 9; 9 − 2 = 7.","reais":false},{"id":"n019","e":0,"q":"9 − 3 − 2","r":"4","s":"9 − 3 = 6; 6 − 2 = 4.","reais":false},{"id":"n020","e":0,"q":"8 − 1 − 4","r":"3","s":"8 − 1 = 7; 7 − 4 = 3.","reais":false},{"id":"n021","e":0,"q":"3 − 1","r":"2","s":"3 − 1 = 2.","reais":false},{"id":"n022","e":0,"q":"8 − 2","r":"6","s":"8 − 2 = 6.","reais":false},{"id":"n023","e":0,"q":"9 − 3","r":"6","s":"9 − 3 = 6.","reais":false},{"id":"n024","e":0,"q":"7 − 4","r":"3","s":"7 − 4 = 3.","reais":false},{"id":"n025","e":0,"q":"5 − 1","r":"4","s":"5 − 1 = 4.","reais":false},{"id":"n026","e":0,"q":"9 − 5","r":"4","s":"9 − 5 = 4.","reais":false},{"id":"n027","e":0,"q":"6 − 2","r":"4","s":"6 − 2 = 4.","reais":false},{"id":"n028","e":0,"q":"4 − 3","r":"1","s":"4 − 3 = 1.","reais":false},{"id":"n029","e":0,"q":"3 − 2","r":"1","s":"3 − 2 = 1.","reais":false},{"id":"n030","e":0,"q":"2 − 1","r":"1","s":"2 − 1 = 1.","reais":false},{"id":"n031","e":1,"q":"7 + 8","r":"15","s":"7 + 8 = 15.","reais":false},{"id":"n032","e":1,"q":"16 − 7","r":"9","s":"16 − 7 = 9.","reais":false},{"id":"n033","e":1,"q":"6 × 4","r":"24","s":"6 × 4 = 24.","reais":false},{"id":"n034","e":1,"q":"36 ÷ 6","r":"6","s":"36 ÷ 6 = 6.","reais":false},{"id":"n035","e":1,"q":"9 + 5 − 3","r":"11","s":"9 + 5 = 14; 14 − 3 = 11.","reais":false},{"id":"n036","e":1,"q":"7 × 3 − 4","r":"17","s":"7 × 3 = 21; 21 − 4 = 17.","reais":false},{"id":"n037","e":1,"q":"24 ÷ 4 + 5","r":"11","s":"24 ÷ 4 = 6; 6 + 5 = 11.","reais":false},{"id":"n038","e":1,"q":"8 + 4 × 2","r":"16","s":"4 × 2 = 8; 8 + 8 = 16.","reais":false},{"id":"n039","e":1,"q":"30 − 6 × 3","r":"12","s":"6 × 3 = 18; 30 − 18 = 12.","reais":false},{"id":"n040","e":1,"q":"42 ÷ 7 + 8","r":"14","s":"42 ÷ 7 = 6; 6 + 8 = 14.","reais":false},{"id":"n041","e":1,"q":"5 × 6 + 7","r":"37","s":"5 × 6 = 30; 30 + 7 = 37.","reais":false},{"id":"n042","e":1,"q":"48 ÷ 8 − 2","r":"4","s":"48 ÷ 8 = 6; 6 − 2 = 4.","reais":false},{"id":"n043","e":1,"q":"18 + 12","r":"30","s":"18 + 12 = 30.","reais":false},{"id":"n044","e":1,"q":"27 − 9","r":"18","s":"27 − 9 = 18.","reais":false},{"id":"n045","e":1,"q":"8 × 7","r":"56","s":"8 × 7 = 56.","reais":false},{"id":"n046","e":1,"q":"54 ÷ 9","r":"6","s":"54 ÷ 9 = 6.","reais":false},{"id":"n047","e":1,"q":"6 × 5 − 8","r":"22","s":"6 × 5 = 30; 30 − 8 = 22.","reais":false},{"id":"n048","e":1,"q":"32 ÷ 4 + 6","r":"14","s":"32 ÷ 4 = 8; 8 + 6 = 14.","reais":false},{"id":"n049","e":1,"q":"45 − 18","r":"27","s":"45 − 18 = 27.","reais":false},{"id":"n050","e":1,"q":"9 × 4 − 12","r":"24","s":"9 × 4 = 36; 36 − 12 = 24.","reais":false},{"id":"n051","e":1,"q":"63 ÷ 7 + 3","r":"12","s":"63 ÷ 7 = 9; 9 + 3 = 12.","reais":false},{"id":"n052","e":1,"q":"14 + 16","r":"30","s":"14 + 16 = 30.","reais":false},{"id":"n053","e":1,"q":"50 − 25","r":"25","s":"50 − 25 = 25.","reais":false},{"id":"n054","e":1,"q":"72 ÷ 8","r":"9","s":"72 ÷ 8 = 9.","reais":false},{"id":"n055","e":1,"q":"3 × 9 + 6","r":"33","s":"3 × 9 = 27; 27 + 6 = 33.","reais":false},{"id":"n056","e":1,"q":"40 ÷ 5 − 3","r":"5","s":"40 ÷ 5 = 8; 8 − 3 = 5.","reais":false},{"id":"n057","e":1,"q":"8 + 18 ÷ 3","r":"14","s":"18 ÷ 3 = 6; 8 + 6 = 14.","reais":false},{"id":"n058","e":1,"q":"6 × 6 + 4","r":"40","s":"6 × 6 = 36; 36 + 4 = 40.","reais":false},{"id":"n059","e":1,"q":"81 ÷ 9 − 4","r":"5","s":"81 ÷ 9 = 9; 9 − 4 = 5.","reais":false},{"id":"n060","e":1,"q":"25 + 7 − 9","r":"23","s":"25 + 7 = 32; 32 − 9 = 23.","reais":false},{"id":"n061","e":2,"q":"8 + 7","r":"15","s":"8 + 7 = 15.","reais":false},{"id":"n062","e":2,"q":"20 − 6","r":"14","s":"20 − 6 = 14.","reais":false},{"id":"n063","e":2,"q":"5 × 7","r":"35","s":"5 × 7 = 35.","reais":false},{"id":"n064","e":2,"q":"56 ÷ 8","r":"7","s":"56 ÷ 8 = 7.","reais":false},{"id":"n065","e":2,"q":"27 + 9","r":"36","s":"27 + 9 = 36.","reais":false},{"id":"n066","e":2,"q":"6 × 9","r":"54","s":"6 × 9 = 54.","reais":false},{"id":"n067","e":2,"q":"3 × 8","r":"24","s":"3 × 8 = 24.","reais":false},{"id":"n068","e":2,"q":"42 ÷ 7","r":"6","s":"42 ÷ 7 = 6.","reais":false},{"id":"n069","e":2,"q":"15 − 4 + 2","r":"13","s":"15 − 4 = 11; 11 + 2 = 13.","reais":false},{"id":"n070","e":2,"q":"7 × 4","r":"28","s":"7 × 4 = 28.","reais":false},{"id":"n071","e":2,"q":"36 ÷ 4","r":"9","s":"36 ÷ 4 = 9.","reais":false},{"id":"n072","e":2,"q":"64 ÷ 8","r":"8","s":"64 ÷ 8 = 8.","reais":false},{"id":"n073","e":2,"q":"1/2 + 1/4","r":"3/4","s":"1/2 = 2/4; 2/4 + 1/4 = 3/4.","reais":false},{"id":"n074","e":2,"q":"3/4 − 1/4","r":"1/2","s":"3/4 − 1/4 = 2/4 = 1/2.","reais":false},{"id":"n075","e":2,"q":"2/3 + 1/3","r":"1","s":"2/3 + 1/3 = 3/3 = 1.","reais":false},{"id":"n076","e":2,"q":"2/5 + 1/5","r":"3/5","s":"2/5 + 1/5 = 3/5.","reais":false},{"id":"n077","e":2,"q":"7/8 − 3/8","r":"1/2","s":"7/8 − 3/8 = 4/8 = 1/2.","reais":false},{"id":"n078","e":2,"q":"1/2 × 6","r":"3","s":"6 ÷ 2 = 3.","reais":false},{"id":"n079","e":2,"q":"3/4 × 2","r":"3/2","s":"3 × 2/4 = 6/4 = 3/2.","reais":false},{"id":"n080","e":2,"q":"2/3 ÷ 2","r":"1/3","s":"2/3 ÷ 2 = 2/6 = 1/3.","reais":false},{"id":"n081","e":2,"q":"3/5 ÷ 3","r":"1/5","s":"3/5 ÷ 3 = 3/15 = 1/5.","reais":false},{"id":"n082","e":2,"q":"1/4 + 1/2","r":"3/4","s":"1/2 = 2/4; 1/4 + 2/4 = 3/4.","reais":false},{"id":"n083","e":2,"q":"4/5 − 2/5","r":"2/5","s":"4/5 − 2/5 = 2/5.","reais":false},{"id":"n084","e":2,"q":"3/7 + 2/7","r":"5/7","s":"3/7 + 2/7 = 5/7.","reais":false},{"id":"n085","e":2,"q":"5/9 − 2/9","r":"1/3","s":"5/9 − 2/9 = 3/9 = 1/3.","reais":false},{"id":"n086","e":2,"q":"1/3 × 6","r":"2","s":"6 ÷ 3 = 2.","reais":false},{"id":"n087","e":2,"q":"3/8 × 4","r":"3/2","s":"3 × 4/8 = 12/8 = 3/2.","reais":false},{"id":"n088","e":2,"q":"4/5 ÷ 2","r":"2/5","s":"4/5 ÷ 2 = 4/10 = 2/5.","reais":false},{"id":"n089","e":2,"q":"2/3 + 1/6","r":"5/6","s":"2/3 = 4/6; 4/6 + 1/6 = 5/6.","reais":false},{"id":"n090","e":2,"q":"5/6 − 1/2","r":"1/3","s":"1/2 = 3/6; 5/6 − 3/6 = 2/6 = 1/3.","reais":false},{"id":"n091","e":3,"q":"1/2 + 1/3","r":"5/6","s":"1/2 = 3/6 e 1/3 = 2/6; soma = 5/6.","reais":false},{"id":"n092","e":3,"q":"3/4 − 1/2","r":"1/4","s":"1/2 = 2/4; 3/4 − 2/4 = 1/4.","reais":false},{"id":"n093","e":3,"q":"3/5 × 5/6","r":"1/2","s":"15/30 = 1/2.","reais":false},{"id":"n094","e":3,"q":"4/5 ÷ 2/5","r":"2","s":"4/5 × 5/2 = 20/10 = 2.","reais":false},{"id":"n095","e":3,"q":"5/8 + 1/8","r":"3/4","s":"5/8 + 1/8 = 6/8 = 3/4.","reais":false},{"id":"n096","e":3,"q":"7/9 − 1/3","r":"4/9","s":"1/3 = 3/9; 7/9 − 3/9 = 4/9.","reais":false},{"id":"n097","e":3,"q":"5/6 − 1/4","r":"7/12","s":"5/6 = 10/12 e 1/4 = 3/12; diferença = 7/12.","reais":false},{"id":"n098","e":3,"q":"2/3 ÷ 4/3","r":"1/2","s":"2/3 × 3/4 = 6/12 = 1/2.","reais":false},{"id":"n099","e":3,"q":"3/8 + 1/4","r":"5/8","s":"1/4 = 2/8; 3/8 + 2/8 = 5/8.","reais":false},{"id":"n100","e":3,"q":"5/12 + 1/3","r":"3/4","s":"1/3 = 4/12; 5/12 + 4/12 = 9/12 = 3/4.","reais":false},{"id":"n101","e":3,"q":"4/9 × 3/8","r":"1/6","s":"12/72 = 1/6.","reais":false},{"id":"n102","e":3,"q":"7/10 × 5/7","r":"1/2","s":"35/70 = 1/2.","reais":false},{"id":"n103","e":3,"q":"5/6 ÷ 5/12","r":"2","s":"5/6 × 12/5 = 12/6 = 2.","reais":false},{"id":"n104","e":3,"q":"2/5 + 1/10","r":"1/2","s":"2/5 = 4/10; 4/10 + 1/10 = 5/10 = 1/2.","reais":false},{"id":"n105","e":3,"q":"3/7 × 7/9","r":"1/3","s":"21/63 = 1/3.","reais":false},{"id":"n106","e":3,"q":"10% de 150","r":"15","s":"10% de 150 = 15.","reais":false},{"id":"n107","e":3,"q":"20% × 85","r":"17","s":"10% de 85 é 8,5; o dobro é 17.","reais":false},{"id":"n108","e":3,"q":"25% de 72","r":"18","s":"25% de 72 = 18.","reais":false},{"id":"n109","e":3,"q":"50% de 94","r":"47","s":"50% de 94 = 47.","reais":false},{"id":"n110","e":3,"q":"75% × 60","r":"45","s":"75% é 3/4; 60 ÷ 4 × 3 = 45.","reais":false},{"id":"n111","e":3,"q":"15% de 200","r":"30","s":"15% de 200 = 30.","reais":false},{"id":"n112","e":3,"q":"30% × 90","r":"27","s":"10% de 90 = 9; 9 × 3 = 27.","reais":false},{"id":"n113","e":3,"q":"40% de 120","r":"48","s":"40% de 120 = 48.","reais":false},{"id":"n114","e":3,"q":"5% de 260","r":"13","s":"5% de 260 = 13.","reais":false},{"id":"n115","e":3,"q":"12,5% × 80","r":"10","s":"12,5% é 1/8; 80 ÷ 8 = 10.","reais":false},{"id":"n116","e":3,"q":"35% × 200","r":"70","s":"30% de 200 = 60 e 5% = 10; total = 70.","reais":false},{"id":"n117","e":3,"q":"60% de 45","r":"27","s":"60% de 45 = 27.","reais":false},{"id":"n118","e":3,"q":"80% × 75","r":"60","s":"10% de 75 = 7,5; 7,5 × 8 = 60.","reais":false},{"id":"n119","e":3,"q":"125% × 40","r":"50","s":"100% de 40 = 40 e 25% = 10; total = 50.","reais":false},{"id":"n120","e":3,"q":"45% de 80","r":"36","s":"45% de 80 = 36.","reais":false},{"id":"n121","e":4,"q":"7/12 + 1/6","r":"3/4","s":"1/6 = 2/12; 7/12 + 2/12 = 9/12 = 3/4.","reais":false},{"id":"n122","e":4,"q":"5/8 − 1/4","r":"3/8","s":"1/4 = 2/8; 5/8 − 2/8 = 3/8.","reais":false},{"id":"n123","e":4,"q":"3/5 + 1/10","r":"7/10","s":"3/5 = 6/10; 6/10 + 1/10 = 7/10.","reais":false},{"id":"n124","e":4,"q":"7/8 − 1/4","r":"5/8","s":"1/4 = 2/8; 7/8 − 2/8 = 5/8.","reais":false},{"id":"n125","e":4,"q":"2/9 + 1/3","r":"5/9","s":"1/3 = 3/9; 2/9 + 3/9 = 5/9.","reais":false},{"id":"n126","e":4,"q":"5/6 × 3/5","r":"1/2","s":"15/30 = 1/2.","reais":false},{"id":"n127","e":4,"q":"3/4 ÷ 3/8","r":"2","s":"3/4 × 8/3 = 24/12 = 2.","reais":false},{"id":"n128","e":4,"q":"7/15 + 1/5","r":"2/3","s":"1/5 = 3/15; 7/15 + 3/15 = 10/15 = 2/3.","reais":false},{"id":"n129","e":4,"q":"5/9 − 1/6","r":"7/18","s":"5/9 = 10/18 e 1/6 = 3/18; diferença = 7/18.","reais":false},{"id":"n130","e":4,"q":"4/7 × 7/8","r":"1/2","s":"28/56 = 1/2.","reais":false},{"id":"n131","e":4,"q":"18% × 250","r":"45","s":"10% = 25 e 8% = 20; 25 + 20 = 45.","reais":false},{"id":"n132","e":4,"q":"12% × 300","r":"36","s":"10% = 30 e 2% = 6; total = 36.","reais":false},{"id":"n133","e":4,"q":"65% × 80","r":"52","s":"50% de 80 = 40 e 15% = 12; total = 52.","reais":false},{"id":"n134","e":4,"q":"35% × 160","r":"56","s":"30% = 48 e 5% = 8; total = 56.","reais":false},{"id":"n135","e":4,"q":"65% × 200","r":"130","s":"50% = 100 e 15% = 30; total = 130.","reais":false},{"id":"n136","e":4,"q":"22% × 150","r":"33","s":"20% = 30 e 2% = 3; total = 33.","reais":false},{"id":"n137","e":4,"q":"75% × 240","r":"180","s":"75% é 3/4; 240 ÷ 4 × 3 = 180.","reais":false},{"id":"n138","e":4,"q":"16% × 125","r":"20","s":"8% de 125 = 10; o dobro é 20.","reais":false},{"id":"n139","e":4,"q":"125 + 275","r":"400","s":"125 + 275 = 400.","reais":false},{"id":"n140","e":4,"q":"360 − 145","r":"215","s":"360 − 100 = 260; 260 − 45 = 215.","reais":false},{"id":"n141","e":4,"q":"24 × 12","r":"288","s":"24 × 10 = 240; 24 × 2 = 48; total = 288.","reais":false},{"id":"n142","e":4,"q":"144 ÷ 12","r":"12","s":"12 × 12 = 144.","reais":false},{"id":"n143","e":4,"q":"250 + 150 ÷ 5","r":"280","s":"150 ÷ 5 = 30; 250 + 30 = 280.","reais":false},{"id":"n144","e":4,"q":"480 ÷ 6 − 35","r":"45","s":"480 ÷ 6 = 80; 80 − 35 = 45.","reais":false},{"id":"n145","e":4,"q":"125 × 4 − 100","r":"400","s":"125 × 4 = 500; 500 − 100 = 400.","reais":false},{"id":"n146","e":4,"q":"720 ÷ 8 + 25","r":"115","s":"720 ÷ 8 = 90; 90 + 25 = 115.","reais":false},{"id":"n147","e":4,"q":"300 − 18 × 5","r":"210","s":"18 × 5 = 90; 300 − 90 = 210.","reais":false},{"id":"n148","e":4,"q":"96 ÷ 4 + 78","r":"102","s":"96 ÷ 4 = 24; 24 + 78 = 102.","reais":false},{"id":"n149","e":4,"q":"225 + 175 − 80","r":"320","s":"225 + 175 = 400; 400 − 80 = 320.","reais":false},{"id":"n150","e":4,"q":"84 ÷ 7 × 9","r":"108","s":"84 ÷ 7 = 12; 12 × 9 = 108.","reais":false},{"id":"n151","e":5,"q":"11/12 − 1/4","r":"2/3","s":"1/4 = 3/12; 11/12 − 3/12 = 8/12 = 2/3.","reais":false},{"id":"n152","e":5,"q":"5/8 + 3/16","r":"13/16","s":"5/8 = 10/16; 10/16 + 3/16 = 13/16.","reais":false},{"id":"n153","e":5,"q":"7/10 − 3/20","r":"11/20","s":"7/10 = 14/20; 14/20 − 3/20 = 11/20.","reais":false},{"id":"n154","e":5,"q":"3/4 ÷ 9/8","r":"2/3","s":"3/4 × 8/9 = 24/36 = 2/3.","reais":false},{"id":"n155","e":5,"q":"4/9 + 1/6","r":"11/18","s":"4/9 = 8/18 e 1/6 = 3/18; soma = 11/18.","reais":false},{"id":"n156","e":5,"q":"5/12 × 6/5","r":"1/2","s":"30/60 = 1/2.","reais":false},{"id":"n157","e":5,"q":"7/8 ÷ 7/4","r":"1/2","s":"7/8 × 4/7 = 28/56 = 1/2.","reais":false},{"id":"n158","e":5,"q":"2/3 − 3/10","r":"11/30","s":"2/3 = 20/30 e 3/10 = 9/30; diferença = 11/30.","reais":false},{"id":"n159","e":5,"q":"3/5 ÷ 9/10","r":"2/3","s":"3/5 × 10/9 = 30/45 = 2/3.","reais":false},{"id":"n160","e":5,"q":"7/12 + 5/18","r":"31/36","s":"7/12 = 21/36 e 5/18 = 10/36; soma = 31/36.","reais":false},{"id":"n161","e":5,"q":"18% × 450","r":"81","s":"10% = 45 e 8% = 36; 45 + 36 = 81.","reais":false},{"id":"n162","e":5,"q":"35% × 800","r":"280","s":"30% = 240 e 5% = 40; total = 280.","reais":false},{"id":"n163","e":5,"q":"12,5% × 640","r":"80","s":"12,5% é 1/8; 640 ÷ 8 = 80.","reais":false},{"id":"n164","e":5,"q":"45% × 600","r":"270","s":"50% = 300; subtraia 5% (30): resultado 270.","reais":false},{"id":"n165","e":5,"q":"22% × 500","r":"110","s":"20% = 100 e 2% = 10; total = 110.","reais":false},{"id":"n166","e":5,"q":"65% × 400","r":"260","s":"50% = 200 e 15% = 60; total = 260.","reais":false},{"id":"n167","e":5,"q":"150% × 240","r":"360","s":"100% = 240 e 50% = 120; total = 360.","reais":false},{"id":"n168","e":5,"q":"7,5% × 800","r":"60","s":"5% = 40 e 2,5% = 20; total = 60.","reais":false},{"id":"n169","e":5,"q":"−24 + 57","r":"33","s":"57 − 24 = 33.","reais":false},{"id":"n170","e":5,"q":"−18 − 27","r":"−45","s":"Somando os módulos: 18 + 27 = 45; o resultado é negativo.","reais":false},{"id":"n171","e":5,"q":"−12 × 8","r":"−96","s":"12 × 8 = 96; sinais diferentes dão resultado negativo.","reais":false},{"id":"n172","e":5,"q":"−144 ÷ 12","r":"−12","s":"144 ÷ 12 = 12; o resultado é negativo.","reais":false},{"id":"n173","e":5,"q":"35 − (−15)","r":"50","s":"Subtrair −15 equivale a somar 15: 35 + 15 = 50.","reais":false},{"id":"n174","e":5,"q":"−7 × (−9)","r":"63","s":"7 × 9 = 63; dois sinais negativos dão resultado positivo.","reais":false},{"id":"n175","e":5,"q":"−250 + 125","r":"−125","s":"250 − 125 = 125; prevalece o sinal negativo.","reais":false},{"id":"n176","e":5,"q":"1200 + 2800","r":"4000","s":"12 centenas + 28 centenas = 40 centenas = 4000.","reais":false},{"id":"n177","e":5,"q":"5000 − 1750","r":"3250","s":"5000 − 1000 = 4000; 4000 − 750 = 3250.","reais":false},{"id":"n178","e":5,"q":"2400 ÷ 6","r":"400","s":"24 ÷ 6 = 4; portanto, 2400 ÷ 6 = 400.","reais":false},{"id":"n179","e":5,"q":"3600 ÷ 9 + 100","r":"500","s":"3600 ÷ 9 = 400; 400 + 100 = 500.","reais":false},{"id":"n180","e":5,"q":"2500 − 750 + 300","r":"2050","s":"2500 − 750 = 1750; 1750 + 300 = 2050.","reais":false},{"id":"n181","e":6,"q":"3x + 12 = 42","r":"10","s":"3x = 42 − 12 = 30; x = 30 ÷ 3 = 10.","reais":false},{"id":"n182","e":6,"q":"5x − 15 = 60","r":"15","s":"5x = 60 + 15 = 75; x = 75 ÷ 5 = 15.","reais":false},{"id":"n183","e":6,"q":"4x + 18 = 70","r":"13","s":"4x = 70 − 18 = 52; x = 52 ÷ 4 = 13.","reais":false},{"id":"n184","e":6,"q":"7x − 21 = 70","r":"13","s":"7x = 70 + 21 = 91; x = 91 ÷ 7 = 13.","reais":false},{"id":"n185","e":6,"q":"6x + 24 = 90","r":"11","s":"6x = 90 − 24 = 66; x = 66 ÷ 6 = 11.","reais":false},{"id":"n186","e":6,"q":"2(x + 3) = 20","r":"7","s":"x + 3 = 10; x = 7.","reais":false},{"id":"n187","e":6,"q":"5(x − 2) = 25","r":"7","s":"x − 2 = 5; x = 7.","reais":false},{"id":"n188","e":6,"q":"12x − 48 = 96","r":"12","s":"12x = 96 + 48 = 144; x = 144 ÷ 12 = 12.","reais":false},{"id":"n189","e":6,"q":"x/4 + 5 = 9","r":"16","s":"x/4 = 4; x = 16.","reais":false},{"id":"n190","e":6,"q":"x/3 − 4 = 6","r":"30","s":"x/3 = 10; x = 30.","reais":false},{"id":"n191","e":6,"q":"12²","r":"144","s":"12 × 12 = 144.","reais":false},{"id":"n192","e":6,"q":"15²","r":"225","s":"15 × 15 = 225.","reais":false},{"id":"n193","e":6,"q":"18²","r":"324","s":"18 × 18 = 324.","reais":false},{"id":"n194","e":6,"q":"25²","r":"625","s":"25 × 25 = 625.","reais":false},{"id":"n195","e":6,"q":"3⁴","r":"81","s":"3 × 3 × 3 × 3 = 9 × 9 = 81.","reais":false},{"id":"n196","e":6,"q":"4⁴","r":"256","s":"4² = 16; 16 × 16 = 256.","reais":false},{"id":"n197","e":6,"q":"5³","r":"125","s":"5 × 5 × 5 = 25 × 5 = 125.","reais":false},{"id":"n198","e":6,"q":"2⁸","r":"256","s":"2⁴ = 16; 16 × 16 = 256.","reais":false},{"id":"n199","e":6,"q":"6³","r":"216","s":"6 × 6 × 6 = 36 × 6 = 216.","reais":false},{"id":"n200","e":6,"q":"11²","r":"121","s":"11 × 11 = 121.","reais":false},{"id":"n201","e":6,"q":"√144","r":"12","s":"12 × 12 = 144; √144 = 12.","reais":false},{"id":"n202","e":6,"q":"√196","r":"14","s":"14 × 14 = 196; √196 = 14.","reais":false},{"id":"n203","e":6,"q":"√225","r":"15","s":"15 × 15 = 225; √225 = 15.","reais":false},{"id":"n204","e":6,"q":"√256","r":"16","s":"16 × 16 = 256; √256 = 16.","reais":false},{"id":"n205","e":6,"q":"√324","r":"18","s":"18 × 18 = 324; √324 = 18.","reais":false},{"id":"n206","e":6,"q":"√400","r":"20","s":"20 × 20 = 400; √400 = 20.","reais":false},{"id":"n207","e":6,"q":"√625","r":"25","s":"25 × 25 = 625; √625 = 25.","reais":false},{"id":"n208","e":6,"q":"√729","r":"27","s":"27 × 27 = 729; √729 = 27.","reais":false},{"id":"n209","e":6,"q":"√841","r":"29","s":"29 × 29 = 841; √841 = 29.","reais":false},{"id":"n210","e":6,"q":"√900","r":"30","s":"30 × 30 = 900; √900 = 30.","reais":false},{"id":"n211","e":7,"q":"4x + 28 = 84","r":"14","s":"4x = 84 − 28 = 56; x = 56 ÷ 4 = 14.","reais":false},{"id":"n212","e":7,"q":"6x − 36 = 90","r":"21","s":"6x = 90 + 36 = 126; x = 126 ÷ 6 = 21.","reais":false},{"id":"n213","e":7,"q":"9x + 45 = 180","r":"15","s":"9x = 180 − 45 = 135; x = 135 ÷ 9 = 15.","reais":false},{"id":"n214","e":7,"q":"7x − 49 = 70","r":"17","s":"7x = 70 + 49 = 119; x = 119 ÷ 7 = 17.","reais":false},{"id":"n215","e":7,"q":"x/5 + 12 = 20","r":"40","s":"x/5 = 8; x = 40.","reais":false},{"id":"n216","e":7,"q":"12x − 96 = 144","r":"20","s":"12x = 144 + 96 = 240; x = 240 ÷ 12 = 20.","reais":false},{"id":"n217","e":7,"q":"x/6 − 9 = 3","r":"72","s":"x/6 = 12; x = 72.","reais":false},{"id":"n218","e":7,"q":"15x − 45 = 180","r":"15","s":"15x = 180 + 45 = 225; x = 225 ÷ 15 = 15.","reais":false},{"id":"n219","e":7,"q":"3(x + 8) = 72","r":"16","s":"x + 8 = 72 ÷ 3 = 24; x = 24 − 8 = 16.","reais":false},{"id":"n220","e":7,"q":"4(x − 6) = 100","r":"31","s":"x − 6 = 100 ÷ 4 = 25; x = 25 + 6 = 31.","reais":false},{"id":"n221","e":7,"q":"14²","r":"196","s":"14 × 14 = 196.","reais":false},{"id":"n222","e":7,"q":"16²","r":"256","s":"16 × 16 = 256.","reais":false},{"id":"n223","e":7,"q":"17²","r":"289","s":"17 × 17 = 289.","reais":false},{"id":"n224","e":7,"q":"3⁵","r":"243","s":"3⁴ = 81; 81 × 3 = 243.","reais":false},{"id":"n225","e":7,"q":"4⁵","r":"1024","s":"4⁴ = 256; 256 × 4 = 1024.","reais":false},{"id":"n226","e":7,"q":"5⁴","r":"625","s":"5² = 25; 25 × 25 = 625.","reais":false},{"id":"n227","e":7,"q":"7³","r":"343","s":"7² = 49; 49 × 7 = 343.","reais":false},{"id":"n228","e":7,"q":"2¹⁰","r":"1024","s":"2⁵ = 32; 32 × 32 = 1024.","reais":false},{"id":"n229","e":7,"q":"9³","r":"729","s":"9² = 81; 81 × 9 = 729.","reais":false},{"id":"n230","e":7,"q":"6⁴","r":"1296","s":"6² = 36; 36 × 36 = 1296.","reais":false},{"id":"n231","e":7,"q":"∛216","r":"6","s":"6 × 6 × 6 = 216; ∛216 = 6.","reais":false},{"id":"n232","e":7,"q":"∛343","r":"7","s":"7 × 7 × 7 = 343; ∛343 = 7.","reais":false},{"id":"n233","e":7,"q":"∛512","r":"8","s":"8 × 8 × 8 = 512; ∛512 = 8.","reais":false},{"id":"n234","e":7,"q":"∛729","r":"9","s":"9 × 9 × 9 = 729; ∛729 = 9.","reais":false},{"id":"n235","e":7,"q":"∛1000","r":"10","s":"10 × 10 × 10 = 1000; ∛1000 = 10.","reais":false},{"id":"n236","e":7,"q":"∛8","r":"2","s":"2 × 2 × 2 = 8.","reais":false},{"id":"n237","e":7,"q":"∛27","r":"3","s":"3 × 3 × 3 = 27.","reais":false},{"id":"n238","e":7,"q":"∛64","r":"4","s":"4 × 4 × 4 = 64.","reais":false},{"id":"n239","e":7,"q":"∛125","r":"5","s":"5 × 5 × 5 = 125.","reais":false},{"id":"n240","e":7,"q":"2⁷","r":"128","s":"2⁷ = 128.","reais":false},{"id":"n241","e":8,"q":"17x + 119 = 408","r":"17","s":"17x = 408 − 119 = 289; x = 289 ÷ 17 = 17.","reais":false},{"id":"n242","e":8,"q":"24x − 216 = 360","r":"24","s":"24x = 360 + 216 = 576; x = 576 ÷ 24 = 24.","reais":false},{"id":"n243","e":8,"q":"x/9 − 14 = 16","r":"270","s":"x/9 = 30; x = 270.","reais":false},{"id":"n244","e":8,"q":"6(x + 21) = 168","r":"7","s":"x + 21 = 28; x = 7.","reais":false},{"id":"n245","e":8,"q":"18x + 162 = 486","r":"18","s":"18x = 486 − 162 = 324; x = 324 ÷ 18 = 18.","reais":false},{"id":"n246","e":8,"q":"28x − 196 = 588","r":"28","s":"28x = 588 + 196 = 784; x = 784 ÷ 28 = 28.","reais":false},{"id":"n247","e":8,"q":"36x + 144 = 900","r":"21","s":"36x = 900 − 144 = 756; x = 756 ÷ 36 = 21.","reais":false},{"id":"n248","e":8,"q":"9(x − 14) = 126","r":"28","s":"x − 14 = 14; x = 28.","reais":false},{"id":"n249","e":8,"q":"x/8 + 19 = 31","r":"96","s":"x/8 = 12; x = 96.","reais":false},{"id":"n250","e":8,"q":"27x − 243 = 486","r":"27","s":"27x = 486 + 243 = 729; x = 729 ÷ 27 = 27.","reais":false},{"id":"n251","e":8,"q":"26²","r":"676","s":"26 × 26 = (25 + 1)² = 625 + 50 + 1 = 676.","reais":false},{"id":"n252","e":8,"q":"24²","r":"576","s":"24 × 24 = (20 + 4)² = 400 + 160 + 16 = 576.","reais":false},{"id":"n253","e":8,"q":"28²","r":"784","s":"28 × 28 = (30 − 2)² = 900 − 120 + 4 = 784.","reais":false},{"id":"n254","e":8,"q":"32²","r":"1024","s":"32 × 32 = (30 + 2)² = 900 + 120 + 4 = 1024.","reais":false},{"id":"n255","e":8,"q":"3⁶","r":"729","s":"3³ = 27; 27 × 27 = 729.","reais":false},{"id":"n256","e":8,"q":"7⁴","r":"2401","s":"7² = 49; 49 × 49 = 2401.","reais":false},{"id":"n257","e":8,"q":"8³","r":"512","s":"8² = 64; 64 × 8 = 512.","reais":false},{"id":"n258","e":8,"q":"13³","r":"2197","s":"13² = 169; 169 × 13 = 2197.","reais":false},{"id":"n259","e":8,"q":"11³","r":"1331","s":"11² = 121; 121 × 11 = 1331.","reais":false},{"id":"n260","e":8,"q":"12³","r":"1728","s":"12² = 144; 144 × 12 = 1728.","reais":false},{"id":"n261","e":8,"q":"√576","r":"24","s":"24 × 24 = 576; √576 = 24.","reais":false},{"id":"n262","e":8,"q":"√1024","r":"32","s":"32 × 32 = 1024; √1024 = 32.","reais":false},{"id":"n263","e":8,"q":"√1225","r":"35","s":"35 × 35 = 1225; √1225 = 35.","reais":false},{"id":"n264","e":8,"q":"√1600","r":"40","s":"40 × 40 = 1600; √1600 = 40.","reais":false},{"id":"n265","e":8,"q":"√1156","r":"34","s":"34 × 34 = 1156.","reais":false},{"id":"n266","e":8,"q":"√1296","r":"36","s":"36 × 36 = 1296.","reais":false},{"id":"n267","e":8,"q":"√1369","r":"37","s":"37 × 37 = 1369.","reais":false},{"id":"n268","e":8,"q":"√1444","r":"38","s":"38 × 38 = 1444.","reais":false},{"id":"n269","e":8,"q":"√1521","r":"39","s":"39 × 39 = 1521.","reais":false},{"id":"n270","e":8,"q":"√1089","r":"33","s":"33 × 33 = 1089.","reais":false}];
+const IDS_NORMAL=BANCO_NORMAL.map(b=>b.id);
+const IDS_ENEM=BANCO_ENEM.map(b=>b.id);
+function itemEnem(b){const r=Array.isArray(b.r)?fr(b.r[0],b.r[1]):fr(b.r);return{tema:"enem",id:b.id,q:b.enunciado,a:r,d:b.d,txt:true,resolucao:b.res,reais:!!b.reais,ajuda:b.ajuda,oficial:!!b.ano,ano:b.ano,cad:b.cad,num:b.num,prova:b.prova}}
+// Questões do banco (etapas 1 a 9). Cada etapa tem 30 questões; evita repetir as últimas 20 usadas.
+// Apresentação da conta: só a conta, sem palavras. Frações empilhadas, potências com expoente em cima.
+function matHTML(t){
+  let s=t.trim().replace(/^(Quanto é|Calcule|Resolva|Simplifique|Efetue|Transforme|Determine|Qual é|Escreva)\s+/i,"").replace(/[?.]+$/,"").trim();
+  let variavel=null;
+  const temIgual=s.includes("=");
+  if(temIgual){const lt=s.replace(/de/g,"").match(/[a-z]/);if(lt)variavel=lt[0]}
+  s=s.replace(/\bx\/(\d+)\b/g,(m,d)=>fracTag("x",d));
+  s=s.replace(/(\d+)\s+(\d+)\/(\d+)/g,(m,w,n,d)=>`${w} ${fracTag(n,d)}`);
+  s=s.replace(/(?<![\d<\/])(\d+)\/(\d+)(?![\d\/])/g,(m,n,d)=>fracTag(n,d));
+  const SUP={"⁰":"0","¹":"1","²":"2","³":"3","⁴":"4","⁵":"5","⁶":"6","⁷":"7","⁸":"8","⁹":"9"};
+  s=s.replace(/([\d\)])([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g,(m,base,exp)=>`${base}<sup>${[...exp].map(c=>SUP[c]).join("")}</sup>`);
+  if(temIgual)return variavel?`${s}, ${variavel} = ?`:s;
+  return `${s} = ?`;
+}
+function itemNormal(b){
+  const v=parsearResposta(b.r).v;
+  return{tema:"banco",id:b.id,q:matHTML(b.q),qTxt:b.q,a:fr(v.n,v.d),d:ETAPAS[b.e].piso+5,resolucao:b.s,reais:!!b.reais};
+}
+function gerarBancoNormal(pos,recentes){
+  const rec=new Set(recentes||[]);
+  let pool=BANCO_NORMAL.filter(b=>b.e===pos&&!rec.has(b.id));
+  if(!pool.length)pool=BANCO_NORMAL.filter(b=>b.e===pos);
+  return itemNormal(escolha(pool));
+}
+// Escolhe o problema mais próximo do alvo, evitando os últimos 20 usados.
+function gerarEnemBanco(alvo,recentes){
+  const rec=new Set(recentes||[]);
+  let pool=BANCO_ENEM.filter(b=>!rec.has(b.id));
+  if(!pool.length)pool=BANCO_ENEM;
+  let melhor=null,nota=Infinity;
+  for(const b of pool){const n=Math.abs(b.d-alvo)+Math.random()*4;if(n<nota){nota=n;melhor=b}}
+  return itemEnem(melhor);
+}
+
+
+// Entre algumas contas sorteadas, escolhe a de dificuldade mais perto do alvo.
+// Evita repetir o mesmo assunto em seguida quando há opções parecidas.
+function gerarPergunta(alvo,ultimoTema,modo,recentes){
+  if(modo==="enem")return gerarEnemBanco(alvo,recentes);
+  let melhor=null,nota=Infinity;
+  for(let i=0;i<CANDIDATOS;i++){
+    const it=escolha(GERADORES)();
+    const n=Math.abs(it.d-alvo)+(it.tema===ultimoTema?5:0)+Math.random();
+    if(n<nota){nota=n;melhor=it}
+  }
+  return melhor;
+}
+
+function parsearResposta(bruto){
+  const s=String(bruto).replace(/r\$/ig,"").replace(/reais?/ig,"").replace(/%/g,"").replace(/\u2212/g,"-").replace(/\s+/g,"");
+  if(!s)return{ok:false,motivo:"vazio"};
+  if(s.length>14)return{ok:false,motivo:"invalido"};
+  if(s.includes("/")){
+    const p=s.split("/");
+    if(p.length!==2||!/^[-+]?\d+$/.test(p[0])||!/^[-+]?\d+$/.test(p[1]))return{ok:false,motivo:"invalido"};
+    const n=+p[0],d=+p[1];
+    if(d===0)return{ok:false,motivo:"zero"};
+    return{ok:true,v:fr(n,d),digitado:[n,d]};
+  }
+  if(/^[-+]?\d+$/.test(s))return{ok:true,v:fr(+s)};
+  const m=s.match(/^([-+]?)(\d+)[.,](\d+)$/);
+  if(!m)return{ok:false,motivo:"invalido"};
+  if(s.includes(".")&&m[3].length===3)return{ok:false,motivo:"ambiguo"};
+  const den=10**m[3].length,valor=(+m[2])*den+(+m[3]);
+  return{ok:true,v:fr(m[1]==="-"?-valor:valor,den),decimal:true,casas:m[3].length};
+}
+
+// Dízimas (denominador com fator diferente de 2 e 5): aceita 1 ou 2 casas decimais,
+// arredondadas para baixo ou para cima. Ex.: 10/3 aceita 3,3 ou 3,33; não aceita 3,333.
+function ehDizima(f){let d=f.d;while(d%2===0)d/=2;while(d%5===0)d/=5;return d!==1}
+function aceitaAproximacao(resp,resultado){
+  if(!resp.decimal||!ehDizima(resultado))return false;
+  if(resp.casas<1||resp.casas>2)return false;
+  const esc=10**resp.casas;
+  const num=resultado.n*esc,den=resultado.d;
+  const baixo=Math.floor(num/den),cima=Math.ceil(num/den);
+  return fIgual(resp.v,fr(baixo,esc))||fIgual(resp.v,fr(cima,esc));
+}
+
+// Etapas: Fácil 1–3, Médio 1–3 e Difícil 1–3. A faixa de cada etapa é a parte da dificuldade daquela dificuldade.
+// Passar exige 8 acertos na etapa 1, 9 na etapa 2 e 9 na etapa 3. Gabaritar (10 de 10) dá bônus de pontos.
+const DIFICULDADES=["Fácil","Médio","Difícil"];
+const ETAPAS=[];
+DIFICULDADES.forEach((nome,d)=>{for(let k=0;k<3;k++){
+  const piso=d*30+10*k;
+  const teto=(d===2&&k===2)?100:piso+9;
+  ETAPAS.push({d,k,nome:`${nome} ${k+1}`,piso,teto,passa:[8,9,9][k]});
+}});
+const ETAPA_FIM=ETAPAS.length-1;
+const ETAPA_ENEM={nome:"ENEM",piso:0,teto:100,passa:8,enem:true};
+// Pontos por acerto conforme a dificuldade da questão: Fácil 10, Médio 20, Difícil 30.
+// Com o cronômetro ligado, gabaritar a etapa 3 multiplica por 5 (500%) o valor de cada questão daquela rodada.
+const PONTOS_POR_DIFICULDADE=[10,20,30];
+// Gabarito do nível 3 (valor total da rodada): 1000% com cronômetro, 500% sem cronômetro (sobre os pontos já ajustados).
+const multiplicadorSuper=est=>est.cronometro?10:5;
+const pontosQuestao=d=>PONTOS_POR_DIFICULDADE[d<30?0:d<60?1:2];
+const PONTOS_ACERTO=10;
+// Pontos acumulados dentro de cada dificuldade para liberar a próxima (0 = sem exigência).
+// Fácil: 150 (libera o Médio). Médio: 300 (libera o Difícil). Difícil: a definir.
+const META_PONTOS_DIFICULDADE=[150,300,0];
+// Ao alcançar a meta de uma dificuldade, a seguinte é liberada na hora, sem esperar o fim da etapa.
+function desbloquearPorPontos(est){
+  META_PONTOS_DIFICULDADE.forEach((meta,d)=>{if(meta>0&&est.pontosDif[d]>=meta)est.desbloqueado=Math.max(est.desbloqueado,(d+1)*3)});
+}
+// Bônus fixo por gabaritar (10 de 10) em qualquer nível, inclusive no ENEM.
+const BONUS_GABARITO=50;
+// Sem cronômetro, todos os pontos (acertos e bônus de gabarito) caem pela metade.
+const fatorPontos=est=>est.cronometro?1:0.5;
+const rotuloEtapa=est=>est.modo==="enem"?"ENEM":ETAPAS[est.pos].nome;
+const etapaAtual=est=>est.modo==="enem"?ETAPA_ENEM:ETAPAS[est.pos];
+
+function estadoInicial(){return{apelido:"",pos:0,desbloqueado:0,modo:"normal",alvo:0,cronometro:false,bloco:[],blocoPts:[],historico:[],temas:{},niveis:{},recentesEnem:[],recentesNormal:[],pontos:0,pontosDif:[0,0,0,0],concluiu:false}}
+function sanear(j){
+  if(!j||typeof j!=="object")return estadoInicial();
+  const e=estadoInicial();
+  if(typeof j.apelido==="string")e.apelido=j.apelido.slice(0,30);
+  // formato antigo: nivel 0..2 vira a primeira etapa daquela dificuldade
+  if(Number.isInteger(j.pos)&&j.pos>=0&&j.pos<=ETAPA_FIM)e.pos=j.pos;
+  else if(Number.isInteger(j.nivel)&&j.nivel>=0&&j.nivel<=2)e.pos=j.nivel*3;
+  const des=Number.isInteger(j.desbloqueado)&&j.desbloqueado>=e.pos&&j.desbloqueado<=ETAPA_FIM?j.desbloqueado:e.pos;
+  e.desbloqueado=des;
+  e.modo=j.modo==="enem"?"enem":"normal";
+  const et=ETAPAS[e.pos];
+  e.alvo=typeof j.alvo==="number"&&j.alvo>=(e.modo==="enem"?0:et.piso)&&j.alvo<=(e.modo==="enem"?100:et.teto)?j.alvo:(e.modo==="enem"?0:et.piso);
+  if(typeof j.cronometro==="boolean")e.cronometro=j.cronometro;
+  if(Array.isArray(j.bloco)&&j.bloco.length<TAM_BLOCO&&j.bloco.every(x=>typeof x==="boolean"))e.bloco=j.bloco;
+  if(Array.isArray(j.blocoPts)&&j.blocoPts.length===e.bloco.length&&j.blocoPts.every(x=>Number.isFinite(x)&&x>=0))e.blocoPts=j.blocoPts;
+  else e.blocoPts=e.bloco.map(()=>0);
+  if(Array.isArray(j.historico))e.historico=j.historico.filter(h=>h&&Number.isInteger(h.a)&&h.a>=0&&h.a<=TAM_BLOCO&&["feliz","media","triste"].includes(h.r)).slice(-MAX_HIST);
+  const ok=(o)=>o&&Number.isInteger(o.n)&&Number.isInteger(o.h)&&o.n>=0&&o.h>=0&&o.h<=o.n;
+  let acertosTotais=0;
+  if(j.temas&&typeof j.temas==="object")for(const k in j.temas)if(TEMAS[k]&&ok(j.temas[k])){e.temas[k]={n:j.temas[k].n,h:j.temas[k].h};acertosTotais+=j.temas[k].h}
+  if(j.niveis&&typeof j.niveis==="object")for(const k in j.niveis)if((k==="enem"||(Number.isInteger(+k)&&+k>=0&&+k<=ETAPA_FIM))&&ok(j.niveis[k]))e.niveis[k]={n:j.niveis[k].n,h:j.niveis[k].h};
+  if(Array.isArray(j.recentesEnem))e.recentesEnem=j.recentesEnem.filter(x=>IDS_ENEM.includes(x)).slice(-20);
+  if(Array.isArray(j.recentesNormal))e.recentesNormal=j.recentesNormal.filter(x=>IDS_NORMAL.includes(x)).slice(-20);
+  e.pontos=Number.isFinite(j.pontos)&&j.pontos>=0?j.pontos:acertosTotais*PONTOS_ACERTO;
+  if(Array.isArray(j.pontosDif)&&j.pontosDif.length===4&&j.pontosDif.every(x=>Number.isFinite(x)&&x>=0))e.pontosDif=j.pontosDif;
+  else if(e.pos<3)e.pontosDif[0]=e.pontos;  // antes da separação, os pontos eram todos do Fácil
+  desbloquearPorPontos(e);
+  e.concluiu=j.concluiu===true||e.desbloqueado>=ETAPA_FIM;
+  return e;
+}
+
+// Registra uma tentativa. Ao fechar a rodada de 10, avalia a etapa e devolve o evento.
+function registrar(est,acertou,tema,d){
+  const o=est.temas[tema]||(est.temas[tema]={n:0,h:0});
+  o.n++;if(acertou)o.h++;
+  const chave=est.modo==="enem"?"enem":String(est.pos);
+  const nv=est.niveis[chave]||(est.niveis[chave]={n:0,h:0});
+  nv.n++;if(acertou)nv.h++;
+  const etapa=etapaAtual(est);
+  const pts=acertou?pontosQuestao(d??0)*fatorPontos(est):0;
+  est.pontos+=pts;
+  est.pontosDif[etapa.enem?3:etapa.d]+=pts;
+  desbloquearPorPontos(est);
+  est.alvo=acertou?Math.min(etapa.teto,est.alvo+PASSO_SOBE):Math.max(etapa.piso,est.alvo-PASSO_DESCE);
+  est.bloco.push(!!acertou);
+  est.blocoPts.push(pts);
+  if(est.bloco.length<TAM_BLOCO)return{evento:null};
+  const acertos=est.bloco.filter(Boolean).length;
+  const gabarito=acertos===TAM_BLOCO;
+  const passou=acertos>=etapa.passa;
+  const resultado=passou?"feliz":acertos>=META_MEDIA?"media":"triste";
+  // Gabarito da etapa 3 com cronômetro ligado: cada questão vale 500% do valor normal.
+  const etapaSuper=gabarito&&!etapa.enem&&etapa.k===2;
+  let bonus=0;
+  if(gabarito)bonus+=BONUS_GABARITO*fatorPontos(est);
+  if(etapaSuper){
+    // sem cronômetro, os pontos já vêm pela metade, então o bônus também cai pela metade
+    const base=est.blocoPts.reduce((x,y)=>x+y,0);
+    bonus+=base*(multiplicadorSuper(est)-1);
+  }
+  est.pontos+=bonus;
+  est.pontosDif[etapa.enem?3:etapa.d]+=bonus;
+  desbloquearPorPontos(est);
+  est.historico.push({a:acertos,r:resultado,etapa:etapa.enem?"ENEM":etapa.nome,g:gabarito?1:0});
+  if(est.historico.length>MAX_HIST)est.historico.splice(0,est.historico.length-MAX_HIST);
+  est.bloco=[];est.blocoPts=[];
+  const base={resultado,acertos,gabarito,bonus,superEtapa:etapaSuper,mult:multiplicadorSuper(est),etapa:etapa.enem?"ENEM":etapa.nome};
+  if(!passou||etapa.enem)return{...base,evento:"fim"};
+  if(est.pos<ETAPA_FIM){
+    // Ao terminar a etapa 3 de uma dificuldade, a próxima só libera com a meta de pontos.
+    const meta=META_PONTOS_DIFICULDADE[etapa.d];
+    if(etapa.k===2&&meta>0&&est.pontosDif[etapa.d]<meta){
+      return{...base,evento:"faltam",faltam:meta-est.pontosDif[etapa.d],meta,proxima:ETAPAS[est.pos+1].nome};
+    }
+    est.pos++;est.desbloqueado=Math.max(est.desbloqueado,est.pos);est.alvo=ETAPAS[est.pos].piso;
+    return{...base,evento:"subiu",proxima:ETAPAS[est.pos].nome};
+  }
+  est.concluiu=true;est.desbloqueado=ETAPA_FIM;
+  return{...base,evento:"concluiu"};
+}
+/*FIM_MOTOR*/
+
+/*UI*/
+const $=id=>document.getElementById(id);
+const armazenamento=(()=>{try{const t="__continhas__";localStorage.setItem(t,t);localStorage.removeItem(t);return localStorage}catch(e){return null}})();
+function carregar(){
+  if(!armazenamento)return estadoInicial();
+  try{return sanear(JSON.parse(armazenamento.getItem(CHAVE)||"null"))}catch(e){return estadoInicial()}
+}
+function salvar(){if(armazenamento)try{armazenamento.setItem(CHAVE,JSON.stringify(est))}catch(e){}}
+let est=carregar();
+let atual=null,respondida=false,ultimoTema=null,tmr=null,prazo=0,duracao=1,qHTML="",preparoPendente=false;
+
+const MSG={
+  vazio:"Digite sua resposta. Para fração, use 3/4.",
+  invalido:"Não entendi. Use números, vírgula para decimais (0,75) ou fração (3/4).",
+  zero:"O denominador não pode ser zero.",
+  ambiguo:"Escreva 1050 para mil e cinquenta, ou 1,050 para o decimal."
+};
+const ROSTO={
+  feliz:'<svg class="rosto" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="36" fill="#3b82f6"/><circle cx="28" cy="34" r="4.5" fill="#14161a"/><circle cx="52" cy="34" r="4.5" fill="#14161a"/><path d="M24 46 Q40 66 56 46" stroke="#14161a" stroke-width="5" fill="none" stroke-linecap="round"/></svg>',
+  media:'<svg class="rosto" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="36" fill="#8fa3c2"/><circle cx="28" cy="34" r="4.5" fill="#14161a"/><circle cx="52" cy="34" r="4.5" fill="#14161a"/><path d="M26 54 H54" stroke="#14161a" stroke-width="5" stroke-linecap="round"/></svg>',
+  triste:'<svg class="rosto" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="36" fill="#ff8585"/><circle cx="28" cy="34" r="4.5" fill="#14161a"/><circle cx="52" cy="34" r="4.5" fill="#14161a"/><path d="M24 62 Q40 46 56 62" stroke="#14161a" stroke-width="5" fill="none" stroke-linecap="round"/></svg>'
+};
+
+function irPara(v){
+  if(v==="ex"&&!est.apelido)v="nome";
+  clearTimeout(entradaTmr);clearTimeout(saidaTmr);
+  ["splash","home","nome","entrada","ex","pr","res"].forEach(x=>{$("v-"+x).hidden=x!==v});
+  document.querySelectorAll("#drawer .tab").forEach(b=>b.dataset.v===v?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
+  $("brand").hidden=v==="splash"||v==="home"||v==="nome"||v==="entrada";
+  if(v!=="ex")pararTempo();
+  if(v==="ex"){preparoPendente=true;if(!atual)novaPergunta();else if(!respondida)iniciarTempo()}
+  if(v==="pr")renderProgresso();
+  if(v==="ex")atualizarPontos();
+  if(v==="home"){$("ola").textContent=est.apelido?`Olá, ${est.apelido}!`:"";$("trocar").hidden=!est.apelido;atualizarHome()}
+  if(v==="nome"){$("apelido").value=est.apelido;$("nomeMsg").textContent=""}
+}
+
+let entradaTmr=null,saidaTmr=null;
+const TEMPO_BEMVINDO=2600,TEMPO_SAIDA=450;
+function totalAcertos(){return est.pontos}
+function atualizarPontos(){
+  const el=$("pontosNum"),antes=+el.textContent||0,novo=totalAcertos();
+  el.textContent=novo;
+  if(novo>antes){el.classList.remove("pulso");void el.offsetWidth;el.classList.add("pulso")}
+}
+
+// Quadrado de boas-vindas com os dados do aluno; depois some e abre os exercícios.
+function animarEntrada(){
+  irPara("entrada");
+  const rodadas=est.historico.length;
+  $("entradaNome").textContent=est.apelido;
+  $("entradaNivel").textContent=rotuloEtapa(est);
+  $("entradaPts").textContent=totalAcertos();
+  $("entradaSub").textContent=rodadas?`${rodadas} rodada(s) concluída(s)`:"Sua primeira rodada está por começar";
+  const feitas=est.bloco.length,circ=2*Math.PI*34,anel=$("anelProg");
+  $("anelNum").textContent=`${feitas}/${TAM_BLOCO}`;
+  anel.style.strokeDasharray=circ;anel.style.strokeDashoffset=circ;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{anel.style.strokeDashoffset=circ*(1-feitas/TAM_BLOCO)}));
+  const sec=$("v-entrada");
+  sec.classList.remove("sair");sec.classList.remove("entrar");void sec.offsetWidth;sec.classList.add("entrar");
+  entradaTmr=setTimeout(sairEntrada,TEMPO_BEMVINDO);
+}
+function sairEntrada(){
+  const sec=$("v-entrada");
+  sec.classList.remove("entrar");sec.classList.add("sair");
+  saidaTmr=setTimeout(()=>irPara("ex"),TEMPO_SAIDA);
+}
+function montarChips(){
+  const dAtual=ETAPAS[est.pos].d;
+  $("niveis").innerHTML=DIFICULDADES.map((nome,d)=>{
+    const bloq=d*3>est.desbloqueado;
+    return `<button type="button" class="chip${bloq?" bloqueado":""}" data-dif="${d}" aria-pressed="${est.modo==="normal"&&d===dAtual}">${nome}${bloq?" 🔒":""}</button>`;
+  }).join("")+`<button type="button" class="chip" data-modo="enem" aria-pressed="${est.modo==="enem"}">ENEM</button>`;
+  $("etapas").innerHTML=est.modo==="normal"?[0,1,2].map(k=>{
+    const idx=dAtual*3+k,bloq=idx>est.desbloqueado;
+    return `<button type="button" class="chip${bloq?" bloqueado":""}" data-etapa="${k}" aria-pressed="${idx===est.pos}">${k+1}${bloq?" 🔒":""}</button>`;
+  }).join(""):"";
+  $("grupoEtapas")?.toggleAttribute("hidden",est.modo==="enem");
+}
+function pintarBloco(){
+  $("nivel").textContent=rotuloEtapa(est);
+  const n=est.bloco.length;
+  $("rodadaTxt").textContent=`Questão ${n+1 > TAM_BLOCO ? TAM_BLOCO : n+1} de ${TAM_BLOCO} nesta rodada`;
+  const pz=$("pauzinhos");
+  if(!pz.children.length)pz.innerHTML=Array.from({length:TAM_BLOCO},()=>"<span></span>").join("");
+  for(let k=0;k<TAM_BLOCO;k++){
+    const c=pz.children[k];
+    c.className=k<n?(est.bloco[k]?"ok":"erro"):"";
+  }
+  montarChips();
+}
+
+function novaPergunta(){
+  atual=est.modo==="enem"?gerarPergunta(est.alvo,ultimoTema,"enem",est.recentesEnem):gerarBancoNormal(est.pos,est.recentesNormal);
+  ultimoTema=atual.tema;respondida=false;
+  if(est.bloco.length===0)preparoPendente=true;
+  if(atual.id&&atual.tema==="enem"){est.recentesEnem=[...est.recentesEnem.filter(x=>x!==atual.id),atual.id].slice(-20);salvar()}
+  if(atual.id&&atual.tema==="banco"){est.recentesNormal=[...est.recentesNormal.filter(x=>x!==atual.id),atual.id].slice(-20);salvar()}
+  $("hint").textContent=atual.ajuda||(atual.reais?"Pode digitar só o número, ex.: 27 ou 27,50 (com ou sem R$).":"Frações: 3/4. Decimais: 0,75. Negativos: −5.");
+  const partes=[];
+  if(atual.oficial)partes.push(`Ref: ENEM ${atual.ano}`);
+  if(atual.tema==="enem")partes.push(atual.d<30?"Fácil":atual.d<60?"Médio":"Difícil");
+  const selo=partes.length?`<span class="ref-oficial">${partes.join(" · ")}</span>`:"";
+  qHTML=selo+`<span class="conta-txt">${atual.q}</span>`+(atual.ask?"<small>Qual é o valor de x?</small>":"")+"";
+  $("q").classList.toggle("oficial",!!selo);
+  $("q").classList.remove("q-entra");
+  $("q").innerHTML=qHTML;
+  $("q").classList.toggle("txt",!!atual.txt);
+  $("tema").textContent=TEMAS[atual.tema].nome;
+  const i=$("in");i.value="";i.disabled=false;
+  $("go").textContent="Conferir";$("go").disabled=false;
+  mostrarFeedback("","");
+  mostrarFim(null);
+  void $("q").offsetWidth;$("q").classList.add("q-entra");
+  pintarBloco();
+  iniciarTempo();
+  i.focus();
+}
+
+const respostaTxt=it=>it.reais?"R$ "+it.a.n.toFixed(2).replace(".",","):fHTML(it.a);
+function mostrarFeedback(cls,html){const fb=$("fb");fb.className=cls;fb.innerHTML=html}
+
+function confetes(){
+  const cores=["#3b82f6","#5fd18b","#8fa3c2","#ff8585","#93c5fd"];
+  return Array.from({length:26},(_,i)=>`<i class="confete" style="--a:${(i*360/26+rnd(-8,8))}deg;--c:${cores[i%cores.length]};--t:${rnd(90,150)}px;animation-delay:${(Math.random()*0.15).toFixed(2)}s"></i>`).join("");
+}
+// Elogio que pula na tela ao acertar. Muda conforme a dificuldade da questão.
+const ELOGIOS={
+  facil:{classe:"facil",frases:["Bom!","Muito bem!","Isso aí!"]},
+  medio:{classe:"medio",frases:["Ótimo!","Muito bom!","Boa!"]},
+  dificil:{classe:"dificil",frases:["Excelente!","Incrível!","Fantástico!"]}
+};
+let elogioTmr=null;
+// Tela inicial: botão para continuar de onde parou e quanto falta para a próxima dificuldade.
+function respostasTotais(){return Object.values(est.temas).reduce((a,o)=>a+o.n,0)}
+function totalAcertosRespostas(){return Object.values(est.temas).reduce((a,o)=>a+o.h,0)}
+function atualizarHome(){
+  const tem=!!est.apelido;
+  $("homeAcoes").hidden=false;
+  $("continuarBtn").textContent=tem?`Continuar: ${rotuloEtapa(est)}`:"Começar";
+  $("homeMeta").hidden=!tem;
+  $("homePizza").hidden=!tem;
+  if(!tem)return;
+  // Respostas somadas por nível: Fácil, Médio, Difícil e ENEM.
+  const soma=(d)=>[0,1,2].reduce((a,k)=>a+((est.niveis[String(d*3+k)]||{n:0}).n),0);
+  const partes=[
+    {valor:soma(0),cor:"#3b82f6",nome:"Fácil"},
+    {valor:soma(1),cor:"#22c55e",nome:"Médio"},
+    {valor:soma(2),cor:"#8b5cf6",nome:"Difícil"},
+    {valor:(est.niveis.enem||{n:0}).n,cor:"#ef4444",nome:"ENEM"}
+  ];
+  $("homePizza").innerHTML=pizza(partes,"Responda uma questão para ver seu progresso por nível.");
+  const d=ETAPAS[est.pos].d,meta=META_PONTOS_DIFICULDADE[d];
+  const prox=DIFICULDADES[d+1];
+  if(!meta||!prox){$("homeMeta").hidden=true;return}
+  $("homeMeta").hidden=false;
+  if(est.desbloqueado>=(d+1)*3){
+    $("metaTxt").textContent=`${prox} já liberado.`;
+    $("metaBarra").style.width="100%";
+    return;
+  }
+  const pts=est.pontosDif[d],falta=Math.max(0,meta-pts),pct=Math.min(100,Math.round(100*pts/meta));
+  $("metaTxt").innerHTML=`<b>${DIFICULDADES[d]}: ${pts} de ${meta} pontos (${pct}%)</b><br>Faltam ${falta} pontos para liberar ${prox}.`;
+  $("metaBarra").style.width=pct+"%";
+}
+$("continuarBtn").onclick=()=>irPara(est.apelido?"ex":"nome");
+function mostrarElogio(d){
+  const grupo=d<30?ELOGIOS.facil:d<60?ELOGIOS.medio:ELOGIOS.dificil;
+  const el=$("elogio");
+  el.textContent=escolha(grupo.frases);
+  el.className="elogio "+grupo.classe;
+  el.hidden=false;
+  void el.offsetWidth;el.classList.add("ativo");
+  clearTimeout(elogioTmr);
+  elogioTmr=setTimeout(()=>{el.hidden=true},1100);
+}
+// Palavra que aparece ao errar: "Quase" quando a resposta está perto, "Errou" ou "Vixi" nos outros casos.
+let palavraErroTmr=null;
+function mostrarPalavraErro(r,it,expirou){
+  let frase;
+  if(expirou)frase="Vixi!";
+  else{
+    const c=it.a;
+    let perto=false;
+    if(r&&r.v){const dif=Math.abs(r.v.n/r.v.d-c.n/c.d);perto=dif<=Math.max(1,0.1*Math.abs(c.n/c.d))}
+    frase=perto?"Quase!":escolha(["Errou!","Vixi!"]);
+  }
+  const el=$("palavraErro");
+  el.textContent=frase;
+  el.hidden=false;
+  void el.offsetWidth;el.classList.add("ativo");
+  clearTimeout(palavraErroTmr);
+  palavraErroTmr=setTimeout(()=>{el.hidden=true;el.classList.remove("ativo")},1100);
+}
+let desbloqTmr=null;
+// Cadeado que abre quando uma etapa ou dificuldade é desbloqueada.
+function mostrarDesbloqueio(nome){
+  const el=$("desbloqueio");
+  $("desbloqueioTxt").textContent=`${nome} desbloqueado!`;
+  el.hidden=false;el.classList.remove("ativo");void el.offsetWidth;el.classList.add("ativo");
+  clearTimeout(desbloqTmr);
+  desbloqTmr=setTimeout(()=>{el.hidden=true},2400);
+}
+function mostrarFim(ev){
+  const f=$("fim");
+  if(!ev){f.hidden=true;f.className="";f.innerHTML="";return}
+  let titulo,texto;
+  const classe=ev.gabarito?"gabarito":ev.resultado;
+  if(ev.gabarito){
+    titulo=ev.superEtapa?"Gabarito de nível 3!":"Gabarito!";
+    texto=`10 de 10. Bônus de ${ev.bonus} pontos${ev.superEtapa?` (inclui ${ev.mult*100}% do nível 3)`:""}.`;
+
+  }
+  else if(ev.evento==="subiu"){titulo=`Você passou para ${ev.proxima}!`;texto=`${ev.acertos} de ${TAM_BLOCO} acertos. Muito bem!`}
+  else if(ev.evento==="concluiu"){titulo="Você concluiu as três dificuldades!";texto="O modo ENEM foi liberado."}
+  else if(ev.evento==="faltam"){titulo=`Faltam ${ev.faltam} pontos para liberar ${ev.proxima}`;texto=`Você tem ${ev.meta-ev.faltam} de ${ev.meta} pontos. Continue na etapa atual.`}
+  else if(ev.resultado==="feliz"){titulo="Etapa concluída";texto=`${ev.acertos} de ${TAM_BLOCO} acertos.`}
+  else if(ev.resultado==="media"){titulo="Boa rodada, na média";texto=`${ev.acertos} de ${TAM_BLOCO} acertos. Você continua nesta etapa e seus pontos foram mantidos.`}
+  else{titulo="Não foi dessa vez";texto=`${ev.acertos} de ${TAM_BLOCO} acertos. Você continua nesta etapa e seus pontos foram mantidos. Tente de novo.`}
+  if(ev.gabarito&&ev.evento==="subiu")texto+=` Você passou para ${ev.proxima}.`;
+  const reduzir=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  f.className="fim "+classe;
+  f.innerHTML=(ev.gabarito&&!reduzir?`<span class="explosao" aria-hidden="true">${confetes()}</span>`:"")+ROSTO[ev.resultado]+`<strong>${titulo}</strong><span class="muted">${texto}</span>`;
+  f.hidden=false;
+  f.setAttribute("role","status");
+}
+
+function responder(bruto){
+  if(!atual)return;
+  if(respondida){novaPergunta();return}
+  const r=parsearResposta(bruto);
+  if(!r.ok){mostrarFeedback("bad",`${MSG[r.motivo]} Isso não conta como tentativa.`);return}
+  const exata=fIgual(r.v,atual.a);
+  const aprox=!exata&&aceitaAproximacao(r,atual.a);
+  finalizar(exata||aprox,{...r,aprox},false);
+}
+
+// Aulas curtas, uma por assunto. Abrem na aba Resoluções.
+const LICOES=[
+ {id:"soma",titulo:"Soma e subtração",texto:"Some ou subtraia coluna por coluna, começando pelas unidades. Se uma soma passa de 9, escreva o que sobra e leve 1 para a coluna da esquerda (vai um). Na subtração, se o número de cima é menor, pegue 1 da dezena (empresta um).",dica:"Confira a conta invertendo: a soma deve voltar ao número inicial.",exemplos:[{titulo:"27 + 15",passos:["Unidades: 7 + 5 = 12. Escreva 2 e leve 1 (vai um).","Dezenas: 2 + 1 + 1 = 4.","Resultado: 42."]},{titulo:"63 − 28",passos:["Unidades: 3 é menor que 8. Empreste 1 da dezena: 13 − 8 = 5.","Dezenas: 5 (era 6, depois do empréstimo) − 2 = 3.","Resultado: 35."]}]},
+ {id:"mult",titulo:"Multiplicação",texto:"Multiplicar é somar grupos iguais. Quando um dos números é grande, quebre-o em dezenas e unidades e multiplique cada parte.",dica:"A tabuada é a base: decore até 10 × 10 e use as partes.",exemplos:[{titulo:"12 × 7",passos:["Quebre o 12 em 10 + 2.","10 × 7 = 70 e 2 × 7 = 14.","70 + 14 = 84."]},{titulo:"6 × 23",passos:["Quebre o 23 em 20 + 3.","6 × 20 = 120 e 6 × 3 = 18.","120 + 18 = 138."]}]},
+ {id:"div",titulo:"Divisão",texto:"Dividir é descobrir quantas vezes um número cabe em outro, ou repartir em partes iguais. Pergunte: qual número, multiplicado pelo divisor, dá o total?",dica:"Confira multiplicando o resultado pelo divisor.",exemplos:[{titulo:"84 ÷ 7",passos:["Quantas vezes 7 cabe em 84? Comece com 7 × 10 = 70.","Sobram 14. Quantas vezes 7 cabe em 14? 7 × 2 = 14.","Total: 10 + 2 = 12."]},{titulo:"96 ÷ 8",passos:["8 × 10 = 80; sobram 16.","8 × 2 = 16, então cabe mais 2.","Resultado: 12."]}]},
+ {id:"frac",titulo:"Frações",texto:"Para somar ou subtrair frações com denominadores diferentes, ache um denominador comum. Para multiplicar, multiplique numeradores e denominadores. Para dividir, multiplique pela inversa da segunda fração. Sempre simplifique o resultado.",dica:"Simplificar é dividir o numerador e o denominador pelo mesmo número.",exemplos:[{titulo:"1/2 + 1/3",passos:["Denominador comum: 6.","1/2 = 3/6 e 1/3 = 2/6.","3/6 + 2/6 = 5/6."]},{titulo:"3/4 × 2/5",passos:["Numeradores: 3 × 2 = 6.","Denominadores: 4 × 5 = 20.","6/20 = 3/10, dividindo por 2."]}]},
+ {id:"perc",titulo:"Porcentagem",texto:"Porcentagem é uma fração de denominador 100. Para achar 1%, divida o número por 100 e multiplique pelo percentual. Algumas porcentagens são atalhos: 50% é metade, 25% é um quarto.",dica:"Percentuais conhecidos (50%, 25%, 10%) são mais rápidos que o cálculo de 1%.",exemplos:[{titulo:"15% de 240",passos:["1% de 240 = 240 ÷ 100 = 2,4.","15 × 2,4 = 36."]},{titulo:"25% de 84",passos:["25% é um quarto: 84 ÷ 4.","84 ÷ 4 = 21."]}]},
+ {id:"neg",titulo:"Números negativos",texto:"Sinais iguais somam os valores e mantêm o sinal. Sinais diferentes subtraem os valores e ficam com o sinal do número de maior valor. Na multiplicação, sinais iguais dão positivo e sinais diferentes dão negativo.",dica:"Pense na reta numérica: negativos ficam à esquerda do zero.",exemplos:[{titulo:"−7 × (−3)",passos:["Sinais iguais: o resultado é positivo.","7 × 3 = 21."]},{titulo:"−9 + 4",passos:["Sinais diferentes: subtraia 9 − 4 = 5.","Fique com o sinal do maior valor (−9): −5."]}]},
+ {id:"expr",titulo:"Expressões e ordem das operações",texto:"Primeiro resolva os parênteses. Depois, multiplicações e divisões, da esquerda para a direita. Por último, somas e subtrações.",dica:"Não some antes de multiplicar: 2 + 3 × 4 é 14, não 20.",exemplos:[{titulo:"14 + 6 ÷ 3",passos:["Primeiro a divisão: 6 ÷ 3 = 2.","Depois a soma: 14 + 2 = 16."]},{titulo:"(8 + 4) × 3 − 5",passos:["Parênteses: 8 + 4 = 12.","Multiplicação: 12 × 3 = 36.","Subtração: 36 − 5 = 31."]}]},
+ {id:"pot",titulo:"Potências e raízes",texto:"Uma potência é uma multiplicação repetida: 3² = 3 × 3. A raiz quadrada faz o caminho inverso: √144 é o número que, multiplicado por ele mesmo, dá 144. A raiz cúbica é o número que, multiplicado três vezes, dá o cubo.",dica:"Memorize os quadrados até 15² e os cubos até 5³.",exemplos:[{titulo:"√144",passos:["Qual número vezes ele mesmo dá 144? 12 × 12 = 144.","Resultado: 12."]},{titulo:"∛27",passos:["Qual número vezes ele mesmo, três vezes, dá 27? 3 × 3 × 3 = 27.","Resultado: 3."]}]},
+ {id:"eq",titulo:"Equações de 1º grau",texto:"Equação é uma igualdade com uma letra desconhecida. Para achar a letra, desfaça as operações na ordem inversa, mexendo nos dois lados da igualdade: o que soma passa subtraindo, o que multiplica passa dividindo.",dica:"Depois de achar o valor, substitua na equação original para conferir.",exemplos:[{titulo:"2x + 5 = 13",passos:["Tire 5 dos dois lados: 2x = 8.","Divida os dois lados por 2: x = 4."]},{titulo:"x/3 − 4 = 2",passos:["Some 4 dos dois lados: x/3 = 6.","Multiplique os dois lados por 3: x = 18."]}]},
+ {id:"enem",titulo:"Problemas com enunciado",texto:"Leia a pergunta antes dos números. Identifique o que está sendo pedido, quais números são usados e qual conta responde exatamente a essa pergunta.",dica:"Sublinhe mentalmente a pergunta: ela diz qual conta fazer.",exemplos:[{titulo:"Um livro custa R$ 48 com 25% de desconto. Qual é o desconto?",passos:["A pergunta pede o valor do desconto, não o preço final.","25% de 48 = 48 ÷ 4 = 12.","Resposta: R$ 12."]},{titulo:"Uma turma tem 36 alunos e 2/9 gostam de arte. Quantos gostam?",passos:["2/9 de 36: 36 ÷ 9 = 4 alunos em cada parte.","2 × 4 = 8 alunos."]}]}
+];
+// Escolhe a aula pelo tipo da conta.
+function licaoDaConta(it){
+  if(it.tema==="enem")return "enem";
+  const q=it.qTxt||it.q||"";
+  if(/[∛√²³⁴⁵⁶⁷⁸⁹⁰¹]/.test(q))return "pot";
+  if(/=/.test(q)&&/[a-z]/.test(q.replace(/de/g,"")))return "eq";
+  if(/%/.test(q))return "perc";
+  if(/\d\/\d|\/\d/.test(q))return "frac";
+  if(/\(\s*[−-]|−\d/.test(q))return "neg";
+  if(/\(/.test(q)||(/[×÷]/.test(q)&&/[+−]/.test(q)))return "expr";
+  if(/×/.test(q))return "mult";
+  if(/÷/.test(q))return "div";
+  return "soma";
+}
+function montarLicoes(){
+  $("listaLicoes").innerHTML=LICOES.map(l=>`<details class="licao" id="licao-${l.id}"><summary>${l.titulo}</summary><p>${l.texto}</p><p class="dica"><b>Dica:</b> ${l.dica}</p>${l.exemplos.map(ex=>`<div class="exemplo"><p class="ex-titulo">Exemplo: ${ex.titulo}</p><ol class="passos-revelar">${ex.passos.map(pp=>`<li hidden>${pp}</li>`).join("")}</ol><button class="ghost btn-passo" type="button" data-total="${ex.passos.length}" data-feitos="0">Mostrar passo 1 de ${ex.passos.length}</button></div>`).join("")}</details>`).join("");
+}
+// Passos revelados um a um, com animação.
+$("listaLicoes").addEventListener("click",e=>{
+  const b=e.target.closest(".btn-passo");if(!b)return;
+  const lista=b.previousElementSibling;
+  const prox=[...lista.children].find(li=>li.hidden);
+  if(!prox)return;
+  prox.hidden=false;prox.classList.remove("entra");void prox.offsetWidth;prox.classList.add("entra");
+  const feitos=+b.dataset.feitos+1,total=+b.dataset.total;
+  b.dataset.feitos=feitos;
+  if(feitos>=total){b.textContent="Resolução concluída";b.disabled=true}
+  else b.textContent=`Mostrar passo ${feitos+1} de ${total}`;
+});
+function abrirLicao(id){
+  navegar("res");
+  setTimeout(()=>{
+    document.querySelectorAll("#listaLicoes details").forEach(d=>d.open=(d.id==="licao-"+id));
+    const alvo=$("licao-"+id);
+    if(alvo)alvo.scrollIntoView({behavior:"smooth",block:"start"});
+  },420);
+}
+// Clique no botão "Ver como resolver" dentro do aviso de erro.
+$("fb").addEventListener("click",e=>{const b=e.target.closest("[data-licao]");if(b)abrirLicao(b.dataset.licao)});
+
+// Aponta, pela resposta digitada, o provável tipo de erro.
+function diagnosticoErro(it,r){
+  if(!r||!r.v)return "A resposta não foi dada a tempo. Responda antes que o tempo acabe.";
+  const c=it.a,v=r.v;
+  if(c.n!==0&&v.n===-c.n&&v.d===c.d)return "O valor está certo, mas com o sinal trocado. Confira se o resultado é positivo ou negativo.";
+  const dif=fr(v.n*c.d-c.n*v.d,v.d*c.d);
+  const ad=Math.abs(dif.n/dif.d);
+  if([10,100,1000].includes(ad))return "A diferença é de 10, 100 ou 1000. Isso costuma ser erro de 'vai um', de 'empresta um' ou de casa.";
+  if(c.d===1&&v.d!==1)return "Você deu uma fração, mas a resposta é um número inteiro. Confira se a conta fecha sem frações.";
+  return "A conta saiu do caminho certo em algum passo. Veja a aula do assunto para conferir cada passo.";
+}
+function finalizar(acertou,r,expirou){
+  respondida=true;pararTempo();
+  const des0=est.desbloqueado;
+  const ev=registrar(est,acertou,atual.tema,atual.d);
+  if(est.desbloqueado>des0)mostrarDesbloqueio(ETAPAS[est.desbloqueado].nome);
+  salvar();atualizarPontos();
+  const explica=atual.resolucao?`<small>Resolução: ${atual.resolucao}</small>`:`<small>${TEMAS[atual.tema].dica}</small>`;
+  if(acertou){
+    mostrarElogio(atual.d);
+    let html='<svg class="check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><b>Certo!</b>';
+    if(r&&r.digitado&&gcd(r.digitado[0],r.digitado[1])>1)html+=`<small>Dá para simplificar: ${fHTML(atual.a)}</small>`;
+    if(r&&r.aprox)html+=`<small>Resposta exata: ${fHTML(atual.a)}, então a aproximação com ${r.casas} casa(s) foi aceita.</small>`;
+    if(atual.resolucao)html+=explica;
+    if(atual.oficial)html+=`<small><a href="${atual.prova}" target="_blank" rel="noopener">Ver a prova oficial (INEP)</a></small>`;
+    mostrarFeedback("ok",html);
+  }else{
+    const inEl=$("in");inEl.classList.remove("sacode");void inEl.offsetWidth;inEl.classList.add("sacode");
+    mostrarPalavraErro(r,atual,expirou);
+    const dadoPor=r&&r.v?`<small>Você respondeu: <b>${fHTML(r.v)}</b></small>`:"";
+    const onde=`<small><b>Onde errou:</b> ${diagnosticoErro(atual,r)}</small>`;
+    const pergunta=`<small>Quer saber como resolver esta conta?</small><button class="ghost" type="button" data-licao="${licaoDaConta(atual)}">Ver como resolver</button>`;
+    mostrarFeedback("bad",`${expirou?"Tempo esgotado. ":""}Resposta correta: <b>${respostaTxt(atual)}</b>${dadoPor}${onde}${pergunta}${atual.oficial?`<small><a href="${atual.prova}" target="_blank" rel="noopener">Ver a prova oficial (INEP)</a></small>`:""}`);
+  }
+  $("in").disabled=true;
+  $("go").textContent=ev.evento?"Nova rodada":"Próxima";
+  mostrarFim(ev.evento?ev:null);
+  pintarBloco();
+  $("go").focus();
+}
+
+// Antes de começar a contar: 3, 2, 1 no lugar da questão, depois a questão e o tempo.
+const PREPARO_MS=3000;
+function iniciarTempo(){
+  pararTempo();
+  const linha=$("trow");
+  if(!est.cronometro||!atual||respondida){
+    linha.hidden=true;
+    if(atual&&!respondida){$("q").innerHTML=qHTML;$("in").disabled=false;$("go").disabled=false}
+    return;
+  }
+  linha.hidden=false;
+  duracao=Math.round((12+0.25*atual.d)*(atual.tema==="enem"?1.2:1)*1000);
+  $("tb").style.width="100%";$("tb").classList.remove("baixo");
+  $("tn").textContent=Math.ceil(duracao/1000)+" s";
+  // Sem preparo pendente (ex.: próxima questão da mesma rodada), o tempo começa direto.
+  if(!preparoPendente){
+    prazo=Date.now()+duracao;
+    tick();tmr=setInterval(tick,100);
+    return;
+  }
+  preparoPendente=false;
+  const inicio=Date.now()+PREPARO_MS;
+  $("in").disabled=true;$("go").disabled=true;
+  let ultimo="";
+  const preparo=()=>{
+    const falta=inicio-Date.now();
+    if(falta>0){
+      const n=Math.ceil(falta/1000);
+      if(n!==ultimo){ultimo=n;$("q").innerHTML=`<span class="contagem" aria-live="assertive">${n}</span><small>Prepare-se</small>`}
+      return;
+    }
+    clearInterval(tmr);
+    $("q").innerHTML=qHTML;
+    $("in").disabled=false;$("go").disabled=false;$("in").focus();
+    prazo=Date.now()+duracao;
+    tick();tmr=setInterval(tick,100);
+  };
+  preparo();
+  tmr=setInterval(preparo,100);
+}
+function tick(){
+  const falta=Math.max(0,prazo-Date.now());
+  $("tb").style.width=(100*falta/duracao)+"%";
+  $("tb").classList.toggle("baixo",falta<duracao*0.3);
+  $("tn").classList.toggle("piscar",falta<duracao*0.3);
+  $("tn").textContent=Math.ceil(falta/1000)+" s";
+  if(falta<=0){pararTempo();if(atual&&!respondida)finalizar(false,null,true)}
+}
+function pararTempo(){if(tmr){clearInterval(tmr);tmr=null}}
+
+// Gráfico de pizza com os resultados das rodadas (passou, média e triste)
+function pizza(partes,vazio){
+  const total=partes.reduce((a,p)=>a+p.valor,0);
+  if(!total){
+    const legVazia=partes.map(p=>`<li><span class="marca" style="background:${p.cor}"></span>${p.nome}: <b>0</b></li>`).join("");
+    return `<div class="pizza-wrap"><svg viewBox="0 0 140 140" class="pizza" role="img" aria-label="${vazio}"><circle cx="70" cy="70" r="60" fill="#2c323e"/><circle cx="70" cy="70" r="30" fill="#191c22"/></svg><ul class="legenda">${legVazia}<li class="muted">${vazio}</li></ul></div>`;
+  }
+  const R=60,C=70;let ang=-Math.PI/2,caminhos="";
+  partes.forEach(p=>{
+    if(!p.valor)return;
+    const f=p.valor/total;
+    if(f>=0.9999){caminhos+=`<circle cx="${C}" cy="${C}" r="${R}" fill="${p.cor}"/>`;return}
+    const a2=ang+f*2*Math.PI;
+    const x1=C+R*Math.cos(ang),y1=C+R*Math.sin(ang),x2=C+R*Math.cos(a2),y2=C+R*Math.sin(a2);
+    caminhos+=`<path d="M${C} ${C} L${x1.toFixed(2)} ${y1.toFixed(2)} A${R} ${R} 0 ${f>0.5?1:0} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z" fill="${p.cor}"/>`;
+    ang=a2;
+  });
+  const legenda=partes.map(p=>`<li><span class="marca" style="background:${p.cor}"></span>${p.nome}: <b>${p.valor}</b> (${Math.round(100*p.valor/total)}%)</li>`).join("");
+  return `<div class="pizza-wrap"><svg viewBox="0 0 140 140" class="pizza" role="img" aria-label="Gráfico de pizza: ${partes.map(p=>p.nome+" "+p.valor).join(", ")}">${caminhos}</svg><ul class="legenda">${legenda}</ul></div>`;
+}
+function barra(p,cls){return `<div class="bar"><i class="${cls}" style="width:${p}%"></i></div>`}
+function renderProgresso(){
+  const h=est.historico;
+  let n=0,acertos=0;
+  for(const k in est.temas){n+=est.temas[k].n;acertos+=est.temas[k].h}
+  const pct=n?Math.round(100*acertos/n):0;
+  const cont=r=>h.filter(x=>x.r===r).length;
+  const pctR=r=>h.length?Math.round(100*cont(r)/h.length):0;
+  const melhor=h.length?Math.max(...h.map(x=>x.a)):0;
+  $("sum").innerHTML=`
+    <div class="grade-stats">
+      <div><b data-n="${h.length}">${h.length}</b><span>rodadas</span></div>
+      <div><b>${pct}%</b><span>acerto geral</span></div>
+      <div><b data-n="${n}">${n}</b><span>respostas</span></div>
+      <div><b>${melhor}/${TAM_BLOCO}</b><span>melhor rodada</span></div>
+    </div>
+    <p class="muted">Passou de nível em ${cont("feliz")} rodada(s) (${pctR("feliz")}%), média em ${cont("media")} (${pctR("media")}%) e triste em ${cont("triste")} (${pctR("triste")}%).</p>
+    <p class="muted">Pontos no Fácil: <b>${est.pontosDif[0]}</b> de ${META_PONTOS_DIFICULDADE[0]}. Médio: <b>${est.pontosDif[1]}</b> de ${META_PONTOS_DIFICULDADE[1]}.</p>
+    <p class="muted">Etapa atual: <b>${rotuloEtapa(est)}</b>${est.concluiu?" · três dificuldades concluídas":""}.</p>`;
+  $("hist").innerHTML=h.length?h.slice(-15).reverse().map((x,i)=>{
+    const rot={feliz:"Passou",media:"Média",triste:"Triste"}[x.r];
+    return `<div class="row"><span style="min-width:4.5em">${x.a} de ${TAM_BLOCO}</span><div style="flex:1">${barra(x.a*10,x.r)}</div><span class="muted" style="min-width:6.5em;text-align:right">${rot} · ${x.etapa||""}</span></div>`}).join(""):'<p class="muted">Nenhuma rodada concluída ainda.</p>';
+  $("pizza").innerHTML=pizza([
+    {valor:cont("feliz"),cor:"#3b82f6",nome:"Passou de nível"},
+    {valor:cont("media"),cor:"#8fa3c2",nome:"Média"},
+    {valor:cont("triste"),cor:"#ff8585",nome:"Triste"}
+  ],"Nenhuma rodada concluída ainda.");
+  $("pizzaPontos").innerHTML=pizza([
+    {valor:est.pontosDif[0],cor:"#3b82f6",nome:"Fácil"},
+    {valor:est.pontosDif[1],cor:"#22c55e",nome:"Médio"},
+    {valor:est.pontosDif[2],cor:"#8b5cf6",nome:"Difícil"},
+    {valor:est.pontosDif[3],cor:"#ef4444",nome:"ENEM"}
+  ],"Ainda sem pontos.");
+  const linhasEtapa=[...ETAPAS.map((et,k)=>({chave:String(k),nome:et.nome})),{chave:"enem",nome:"ENEM"}];
+  $("niv").innerHTML=linhasEtapa.map(({chave,nome})=>{
+    const o=est.niveis[chave]||{n:0,h:0},p=o.n?Math.round(100*o.h/o.n):0;
+    return `<div class="row"><div style="flex:1"><div>${nome}</div>${barra(p,o.n&&p<70?"baixo":"")}</div><span class="muted" style="min-width:7em;text-align:right">${o.n?p+"% · "+o.n:"sem dados"}</span></div>`;
+  }).join("");
+  $("zerar").disabled=!est.concluiu;
+  $("zerar").textContent=est.concluiu?"Zerar progresso":"Zerar liberado ao concluir o Difícil 3";
+  document.querySelectorAll("#sum b[data-n]").forEach(el=>{
+    const alvo=+el.dataset.n;const t0=performance.now();
+    const passo=t=>{const f=Math.min(1,(t-t0)/700);el.textContent=Math.round(alvo*f);if(f<1)requestAnimationFrame(passo)};
+    requestAnimationFrame(passo);
+  });
+  $("temas").innerHTML=Object.keys(TEMAS).map(k=>{
+    const o=est.temas[k]||{n:0,h:0},p=o.n?Math.round(100*o.h/o.n):0;
+    return `<div class="row"><div style="flex:1"><div>${TEMAS[k].nome}</div>${barra(p,o.n&&p<70?"baixo":"")}</div><span class="muted" style="min-width:7em;text-align:right">${o.n?p+"% · "+o.n:"sem dados"}</span></div>`;
+  }).join("");
+}
+
+const menuBtn=$("menuBtn");
+function toggleMenu(abrir){
+  $("drawer").hidden=!abrir;$("ov").hidden=!abrir;
+  menuBtn.setAttribute("aria-expanded",String(abrir));
+  menuBtn.setAttribute("aria-label",abrir?"Fechar menu":"Abrir menu");
+  if(abrir)$("drawer").querySelector(".tab").focus();
+}
+menuBtn.onclick=()=>toggleMenu($("drawer").hidden);
+$("ov").onclick=()=>{toggleMenu(false);menuBtn.focus()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("drawer").hidden){toggleMenu(false);menuBtn.focus()}});
+$("drawer").onclick=e=>{const b=e.target.closest(".tab");if(b){toggleMenu(false);navegar(b.dataset.v)}};
+$("brand").onclick=()=>navegar("home");
+
+// Troca de página com uma cortina amarela que cobre e revela a tela.
+let navegando=false;
+function navegar(v){
+  const reduzir=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(reduzir||navegando){irPara(v);return}
+  navegando=true;
+  const c=$("cortina");
+  c.className="cobre";
+  setTimeout(()=>{irPara(v);c.className="revela"},330);
+  setTimeout(()=>{c.className="";navegando=false},730);
+}
+
+
+$("entradaPular").onclick=()=>{clearTimeout(entradaTmr);clearTimeout(saidaTmr);irPara("ex")};
+$("trocar").onclick=()=>irPara("nome");
+$("iniciar").onclick=()=>irPara("home");
+function salvarNome(){
+  const n=$("apelido").value.trim().slice(0,30);
+  if(!n){$("nomeMsg").textContent="Digite seu nome para continuar.";$("apelido").focus();return}
+  est.apelido=n;salvar();animarEntrada();
+}
+$("continuar").onclick=salvarNome;
+$("apelido").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();salvarNome()}};
+$("f").onsubmit=e=>{e.preventDefault();responder($("in").value)};
+function avisoEtapa(msg){$("avisoNivel").textContent=msg}
+function trocarEtapa(pos,modo){
+  est.modo=modo;
+  if(modo==="normal"){est.pos=pos;est.alvo=ETAPAS[pos].piso}
+  else est.alvo=0;
+  est.bloco=[];
+  salvar();avisoEtapa("");montarChips();pintarBloco();atual=null;novaPergunta();
+}
+$("niveis").onclick=e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.modo==="enem"){
+    trocarEtapa(est.pos,"enem");return;
+  }
+  if(b.dataset.dif===undefined)return;
+  const d=+b.dataset.dif;
+  if(d*3>est.desbloqueado){
+    avisoEtapa(`Para liberar ${DIFICULDADES[d]}, conclua ${ETAPAS[d*3-1].nome}.`);return;
+  }
+  const k=ETAPAS[est.pos].d===d?ETAPAS[est.pos].k:0;
+  trocarEtapa(d*3+k,"normal");
+};
+$("etapas").onclick=e=>{
+  const b=e.target.closest("[data-etapa]");if(!b)return;
+  const idx=ETAPAS[est.pos].d*3+(+b.dataset.etapa);
+  if(idx>est.desbloqueado){
+    avisoEtapa(`Para liberar ${ETAPAS[idx].nome}, conclua ${ETAPAS[idx-1].nome}.`);return;
+  }
+  trocarEtapa(idx,"normal");
+};
+$("tg").onchange=()=>{est.cronometro=$("tg").checked;salvar();if(atual&&!respondida)iniciarTempo()};
+$("zerar").onclick=()=>{
+  if(!est.concluiu)return;
+  if(!confirm("Zerar o progresso deste navegador? O nome e o cronômetro serão mantidos."))return;
+  const ap=est.apelido,cr=est.cronometro;
+  est=estadoInicial();est.apelido=ap;est.cronometro=cr;
+  salvar();atual=null;respondida=false;
+  montarChips();pintarBloco();renderProgresso();
+};
+
+$("tg").checked=est.cronometro;
+montarLicoes();
+montarChips();
+pintarBloco();
+$("splashOla").textContent=est.apelido?`Bem-vinda de volta, ${est.apelido}!`:"";
+irPara("splash");
+/*FIM_UI*/
+</script>
+</body>
+</html>
